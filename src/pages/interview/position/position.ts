@@ -120,12 +120,34 @@ Page({
   // 搜索岗位
   onSearch(e: WechatMiniprogram.Input) {
     const searchValue = e.detail.value.trim().toLowerCase();
-    this.setData({ searchValue });
+    
+    // 过滤符合搜索条件的岗位
+    let filteredPositions = [];
+    if (searchValue) {
+      filteredPositions = this.data.positions.filter(p => 
+        p.name.toLowerCase().includes(searchValue) || 
+        p.description.toLowerCase().includes(searchValue) ||
+        p.tags.some(tag => tag.toLowerCase().includes(searchValue))
+      );
+    } else {
+      // 如果没有搜索词，显示全部岗位
+      filteredPositions = [...this.data.positions];
+    }
+    
+    this.setData({ 
+      searchValue,
+      filteredPositions,
+      filteredPositionsCount: filteredPositions.length
+    });
   },
 
   // 清除搜索
   clearSearch() {
-    this.setData({ searchValue: '' });
+    this.setData({ 
+      searchValue: '',
+      filteredPositions: [...this.data.positions],
+      filteredPositionsCount: this.data.positions.length
+    });
   },
 
   // 返回首页
