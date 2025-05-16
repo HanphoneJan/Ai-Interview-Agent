@@ -1,0 +1,111 @@
+<!-- pages/interview/result/result.wxml -->
+<view class="result-container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <view class="back-btn" bindtap="goHome">
+      <text class="iconfont icon-home"></text>
+    </view>
+    <view class="title">面试结果</view>
+    <view class="share-btn" bindtap="showShareOptions">
+      <text class="iconfont icon-share"></text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在分析面试结果...</text>
+  </view>
+
+  <!-- 结果内容 -->
+  <scroll-view class="result-content" scroll-y="true" wx:if="{{!loading}}">
+    <!-- 基本信息 -->
+    <view class="basic-info">
+      <view class="position-info">
+        <image class="position-icon" src="{{result.position.icon}}" mode="aspectFit"></image>
+        <view class="position-name">{{result.position.name}}</view>
+        <view class="interview-date">{{formatDate(result.date)}}</view>
+      </view>
+
+      <view class="score-container">
+        <view class="overall-score">
+          <view class="score-value">{{result.overallScore}}</view>
+          <view class="score-label">综合评分</view>
+        </view>
+        <view class="time-info">
+          <view class="time-item">
+            <text class="iconfont icon-question"></text>
+            <text>{{result.questions.length}}个问题</text>
+          </view>
+          <view class="time-item">
+            <text class="iconfont icon-time"></text>
+            <text>{{formatTime(result.totalTime)}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 能力雷达图 -->
+    <view class="radar-chart-container">
+      <view class="section-title">能力评估</view>
+      <canvas canvas-id="radarChart" class="radar-chart"></canvas>
+    </view>
+
+    <!-- 改进建议 -->
+    <view class="suggestions-container">
+      <view class="section-title">改进建议</view>
+      <view class="suggestions-list">
+        <block wx:for="{{result.suggestions}}" wx:key="*this">
+          <view class="suggestion-item">
+            <text class="iconfont icon-suggestion"></text>
+            <text class="suggestion-text">{{item}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 问题回顾 -->
+    <view class="questions-container">
+      <view class="section-title">问题回顾</view>
+      <view class="questions-list">
+        <block wx:for="{{result.questions}}" wx:key="id">
+          <view class="question-item">
+            <view class="question-header">
+              <view class="question-type {{item.type}}">
+                {{item.type === 'basic' ? '基础' : item.type === 'technical' ? '技术' : '行为'}}
+              </view>
+              <view class="question-content">{{item.content}}</view>
+            </view>
+            <view class="question-answer" wx:if="{{item.answer}}">
+              <view class="answer-label">你的回答：</view>
+              <view class="answer-content">{{item.answer}}</view>
+            </view>
+            <view class="question-answer" wx:else>
+              <view class="answer-label">未记录回答</view>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-buttons">
+    <button class="restart-btn" bindtap="restartInterview">重新面试</button>
+    <button class="home-btn" bindtap="goHome">返回首页</button>
+  </view>
+
+  <!-- 分享选项 -->
+  <view class="share-overlay" wx:if="{{showShare}}" catchtap="hideShareOptions">
+    <view class="share-options" catchtap="stopPropagation">
+      <view class="share-option" bindtap="shareToMoments">
+        <text class="iconfont icon-moments"></text>
+        <text>生成分享图片</text>
+      </view>
+      <view class="share-option" bindtap="exportPDF">
+        <text class="iconfont icon-pdf"></text>
+        <text>导出PDF报告</text>
+      </view>
+    </view>
+  </view>
+</view>

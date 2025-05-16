@@ -1,62 +1,161 @@
 /**index.wxss**/
-page {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.scrollarea {
-  flex: 1;
-  overflow-y: hidden;
+.container {
+  padding: 20rpx;
+  box-sizing: border-box;
+  background-color: #f8f8f8;
+  min-height: 100vh;
 }
 
-.userinfo {
+/* 用户信息区域 */
+.user-info-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #aaa;
-  width: 80%;
-}
-
-.userinfo-avatar {
-  overflow: hidden;
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
-}
-
-.usermotto {
-  margin-top: 200px;
+  padding: 40rpx 0;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 
 .avatar-wrapper {
   padding: 0;
-  width: 56px !important;
-  border-radius: 8px;
-  margin-top: 40px;
-  margin-bottom: 40px;
+  width: 160rpx !important;
+  height: 160rpx !important;
+  border-radius: 50%;
+  margin-bottom: 20rpx;
+  background-color: transparent;
+}
+
+.avatar-wrapper::after {
+  border: none;
 }
 
 .avatar {
-  display: block;
-  width: 56px;
-  height: 56px;
-}
-
-.nickname-wrapper {
-  display: flex;
-  width: 100%;
-  padding: 16px;
-  box-sizing: border-box;
-  border-top: .5px solid rgba(0, 0, 0, 0.1);
-  border-bottom: .5px solid rgba(0, 0, 0, 0.1);
-  color: black;
-}
-
-.nickname-label {
-  width: 105px;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  border: 2rpx solid #f0f0f0;
 }
 
 .nickname-input {
-  flex: 1;
+  text-align: center;
+  font-size: 32rpx;
+  color: #333333;
+  padding: 10rpx 0;
+  width: 300rpx;
 }
+
+.nickname {
+  font-size: 32rpx;
+  color: #333333;
+  margin-top: 20rpx;
+}
+
+/* 欢迎语区域 */
+.welcome-section {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.welcome-text {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.sub-text {
+  font-size: 28rpx;
+  color: #666666;
+  display: block;
+}
+
+/* 功能区域 */
+.function-section {
+  padding: 30rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 主按钮 */
+.primary-btn {
+  width: 100% !important;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #07c160;
+  color: #ffffff;
+  font-size: 32rpx;
+  border-radius: 44rpx;
+  margin-bottom: 40rpx;
+}
+
+.primary-btn::after {
+  border: none;
+}
+
+/* 功能卡片列表 */
+.feature-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+  padding: 20rpx 0;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30rpx 20rpx;
+  background-color: #f8f8f8;
+  border-radius: 12rpx;
+  transition: all 0.3s ease;
+}
+
+.feature-item:active {
+  transform: scale(0.98);
+  background-color: #f0f0f0;
+}
+
+.feature-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.feature-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.feature-desc {
+  font-size: 24rpx;
+  color: #666666;
+  text-align: center;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-info-section,
+.welcome-section,
+.function-section {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.feature-item:nth-child(1) { animation-delay: 0.1s; }
+.feature-item:nth-child(2) { animation-delay: 0.2s; }
+.feature-item:nth-child(3) { animation-delay: 0.3s; }

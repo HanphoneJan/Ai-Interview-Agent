@@ -1,0 +1,185 @@
+/* pages/user/profile/profile.wxss */
+
+.profile-container {
+  min-height: 100vh;
+  background-color: #f8f8f8;
+  padding-bottom: 30rpx;
+}
+
+.header {
+  background-color: #ffffff;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #eaeaea;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+  text-align: center;
+}
+
+/* 未登录状态 */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+  background-color: #ffffff;
+  margin: 30rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.default-avatar {
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 50%;
+  margin-bottom: 30rpx;
+  background-color: #f0f0f0;
+}
+
+.login-text {
+  font-size: 32rpx;
+  color: #666666;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 60%;
+  height: 80rpx;
+  line-height: 80rpx;
+  background-color: #07c160;
+  color: #ffffff;
+  font-size: 30rpx;
+  border-radius: 40rpx;
+}
+
+/* 已登录状态 */
+.user-info-section {
+  display: flex;
+  align-items: center;
+  padding: 40rpx 30rpx;
+  background-color: #ffffff;
+  margin: 30rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.avatar-container {
+  margin-right: 30rpx;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 2rpx solid #f0f0f0;
+}
+
+.info-container {
+  flex: 1;
+}
+
+.name-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-right: 10rpx;
+}
+
+.name-input {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+  border-bottom: 2rpx solid #07c160;
+  padding: 0 10rpx;
+  width: 300rpx;
+}
+
+.edit-icon {
+  padding: 10rpx;
+}
+
+.nickname {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* 功能区 */
+.function-section {
+  background-color: #ffffff;
+  margin: 30rpx;
+  border-radius: 12rpx;
+  padding: 20rpx 0;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.function-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.function-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.function-item:last-child {
+  border-bottom: none;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+}
+
+.item-text {
+  font-size: 30rpx;
+  color: #333333;
+  margin-left: 20rpx;
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+}
+
+.status-text {
+  font-size: 28rpx;
+  color: #999999;
+  margin-right: 10rpx;
+}
+
+/* 图标样式 */
+.iconfont {
+  font-size: 36rpx;
+  color: #666666;
+}
+
+.icon-edit, .icon-check {
+  font-size: 32rpx;
+  color: #07c160;
+}
+
+.icon-file, .icon-history {
+  color: #07c160;
+}
+
+.icon-right {
+  font-size: 28rpx;
+  color: #cccccc;
+}

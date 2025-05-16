@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {},
+  "disableScroll": true,
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#f8f8f8",
+  "pageOrientation": "portrait"
+}

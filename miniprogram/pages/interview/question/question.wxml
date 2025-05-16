@@ -1,0 +1,147 @@
+<!-- pages/interview/question/question.wxml -->
+<view class="question-container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="iconfont icon-back"></text>
+    </view>
+    <view class="title">{{position.name}}面试</view>
+    <view class="timer">
+      <text class="iconfont icon-time"></text>
+      <text class="timer-text">{{Math.floor(remainingTime/60)}}:{{remainingTime%60 < 10 ? '0' + remainingTime%60 : remainingTime%60}}</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">准备面试问题中...</text>
+  </view>
+
+  <!-- 面试准备页面 -->
+  <view class="interview-ready" wx:if="{{!loading && interviewStatus === 'ready'}}">
+    <view class="position-info">
+      <image class="position-icon" src="{{position.icon}}" mode="aspectFit"></image>
+      <view class="position-name">{{position.name}}</view>
+      <view class="position-desc">{{position.description}}</view>
+    </view>
+
+    <view class="interview-info">
+      <view class="info-item">
+        <text class="iconfont icon-question"></text>
+        <text>共{{totalQuestions}}个问题</text>
+      </view>
+      <view class="info-item">
+        <text class="iconfont icon-time"></text>
+        <text>预计{{position.duration}}分钟</text>
+      </view>
+    </view>
+
+    <view class="tips-container" wx:if="{{showTips}}">
+      <view class="tips-header">
+        <text class="tips-title">面试提示</text>
+        <text class="tips-toggle" bindtap="toggleTips">收起</text>
+      </view>
+      <view class="tips-content">
+        <view class="tip-item">1. 请确保光线充足，面部清晰可见</view>
+        <view class="tip-item">2. 请保持安静的环境，避免背景噪音</view>
+        <view class="tip-item">3. 面试过程中将会录制视频和音频</view>
+        <view class="tip-item">4. 每个问题有固定的回答时间</view>
+        <view class="tip-item">5. 请自然表达，保持良好的精神状态</view>
+      </view>
+    </view>
+    <view class="tips-collapsed" wx:else bindtap="toggleTips">
+      <text class="iconfont icon-tips"></text>
+      <text>查看面试提示</text>
+    </view>
+
+    <button class="start-button" bindtap="startInterview">开始面试</button>
+  </view>
+
+  <!-- 倒计时页面 -->
+  <view class="countdown-container" wx:if="{{!loading && interviewStatus === 'countdown'}}">
+    <view class="countdown-number">{{countdownSeconds}}</view>
+    <view class="countdown-text">准备回答问题 {{currentQuestionIndex + 1}}/{{totalQuestions}}</view>
+  </view>
+
+  <!-- 面试进行中页面 -->
+  <view class="interview-ongoing" wx:if="{{!loading && (interviewStatus === 'ongoing' || interviewStatus === 'paused')}}">
+    <view class="question-progress">
+      <view class="progress-bar">
+        <view class="progress-inner" style="width: {{(currentQuestionIndex + 1) / totalQuestions * 100}}%"></view>
+      </view>
+      <view class="progress-text">问题 {{currentQuestionIndex + 1}}/{{totalQuestions}}</view>
+    </view>
+
+    <view class="question-content">
+      <view class="question-type">
+        <text class="type-tag {{questions[currentQuestionIndex].type}}">
+          {{questions[currentQuestionIndex].type === 'basic' ? '基础问题' : 
+            questions[currentQuestionIndex].type === 'technical' ? '技术问题' : '行为问题'}}
+        </text>
+      </view>
+      <view class="question-text">{{questions[currentQuestionIndex].content}}</view>
+    </view>
+
+    <!-- 摄像头区域 -->
+    <view class="camera-container">
+      <camera 
+        device-position="front" 
+        flash="off" 
+        class="camera" 
+        wx:if="{{interviewStatus === 'ongoing'}}"
+      ></camera>
+      <view class="camera-placeholder" wx:else>
+        <text class="iconfont icon-pause"></text>
+        <text class="pause-text">已暂停</text>
+      </view>
+
+      <!-- 控制按钮 -->
+      <view class="camera-controls">
+        <view class="control-btn" bindtap="{{interviewStatus === 'ongoing' ? 'pauseInterview' : 'resumeInterview'}}">
+          <text class="iconfont {{interviewStatus === 'ongoing' ? 'icon-pause' : 'icon-play'}}"></text>
+        </view>
+        <view class="control-btn" bindtap="finishCurrentQuestion">
+          <text class="iconfont icon-next"></text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 语音识别结果 -->
+    <view class="recognition-container">
+      <view class="recognition-header">
+        <text class="recognition-title">实时语音转文字</text>
+        <text class="recognition-status {{isRecognizing ? 'active' : ''}}">
+          {{isRecognizing ? '识别中...' : '未识别'}}
+        </text>
+      </view>
+      <scroll-view class="recognition-content" scroll-y="true" scroll-with-animation="true">
+        <text>{{recognitionResult || '等待您的回答...'}}</text>
+      </scroll-view>
+    </view>
+
+    <!-- 下一题按钮 -->
+    <button class="next-button" bindtap="nextQuestion" wx:if="{{showNextButton}}">
+      {{currentQuestionIndex >= totalQuestions - 1 ? '完成面试' : '下一题'}}
+    </button>
+  </view>
+
+  <!-- 面试完成页面 -->
+  <view class="interview-completed" wx:if="{{!loading && interviewStatus === 'completed'}}">
+    <view class="completed-icon">
+      <text class="iconfont icon-success"></text>
+    </view>
+    <view class="completed-title">面试完成</view>
+    <view class="completed-desc">正在生成您的面试报告...</view>
+    <view class="completed-stats">
+      <view class="stat-item">
+        <text class="stat-value">{{totalQuestions}}</text>
+        <text class="stat-label">问题数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{Math.floor(elapsedTime/60)}}:{{elapsedTime%60 < 10 ? '0' + elapsedTime%60 : elapsedTime%60}}</text>
+        <text class="stat-label">总用时</text>
+      </view>
+    </view>
+  </view>
+</view>

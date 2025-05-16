@@ -1,27 +1,52 @@
 <!--index.wxml-->
-<scroll-view class="scrollarea" scroll-y type="list">
-  <view class="container">
-    <view class="userinfo">
-      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        </button>
-        <view class="nickname-wrapper">
-          <text class="nickname-label">昵称</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
-        </view>
-      </block>
-      <block wx:elif="{{!hasUserInfo}}">
-        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
-      </block>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
+<view class="container">
+  <!-- 顶部用户信息区域 -->
+  <view class="user-info-section">
+    <block wx:if="{{!hasUserInfo}}">
+      <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+        <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+      </button>
+      <input type="nickname" class="nickname-input" placeholder="请输入昵称" bindchange="onInputChange" />
+    </block>
+    <block wx:else>
+      <image class="avatar" src="{{userInfo.avatarUrl}}" bindtap="navigateToProfile"></image>
+      <text class="nickname">{{userInfo.nickName}}</text>
+    </block>
+  </view>
+
+  <!-- 欢迎语 -->
+  <view class="welcome-section">
+    <text class="welcome-text">欢迎使用{{motto}}</text>
+    <text class="sub-text">让AI助你提升面试技能</text>
+  </view>
+
+  <!-- 主要功能区域 -->
+  <view class="function-section">
+    <!-- 开始面试按钮 -->
+    <button class="primary-btn" bindtap="startInterview" wx:if="{{hasUserInfo}}">
+      开始模拟面试
+    </button>
+    <button class="primary-btn" bindtap="getUserProfile" wx:else>
+      登录开始体验
+    </button>
+
+    <!-- 功能卡片列表 -->
+    <view class="feature-list">
+      <view class="feature-item">
+        <image class="feature-icon" src="/assets/images/interview.png" mode="aspectFit"></image>
+        <text class="feature-title">智能面试</text>
+        <text class="feature-desc">AI驱动的真实面试体验</text>
+      </view>
+      <view class="feature-item">
+        <image class="feature-icon" src="/assets/images/analysis.png" mode="aspectFit"></image>
+        <text class="feature-title">多维分析</text>
+        <text class="feature-desc">专业的面试表现分析</text>
+      </view>
+      <view class="feature-item">
+        <image class="feature-icon" src="/assets/images/report.png" mode="aspectFit"></image>
+        <text class="feature-title">详细报告</text>
+        <text class="feature-desc">个性化的改进建议</text>
+      </view>
     </view>
   </view>
-</scroll-view>
+</view>
