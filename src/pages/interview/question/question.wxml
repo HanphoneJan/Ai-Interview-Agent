@@ -83,18 +83,25 @@
       <view class="question-text">{{questions[currentQuestionIndex].content}}</view>
     </view>
 
-    <!-- 摄像头区域 -->
-    <view class="camera-container">
-      <camera 
-        device-position="front" 
-        flash="off" 
-        class="camera" 
-        wx:if="{{interviewStatus === 'ongoing'}}"
-      ></camera>
-      <view class="camera-placeholder" wx:else>
-        <text class="iconfont icon-pause"></text>
-        <text class="pause-text">已暂停</text>
-      </view>
+          <!-- 摄像头区域 -->
+          <view class="camera-container">
+            <camera 
+              device-position="front" 
+              flash="off" 
+              class="camera" 
+              id="interviewCamera"
+              wx:if="{{interviewStatus === 'ongoing'}}"
+            ></camera>
+            <view class="camera-placeholder" wx:else>
+              <text class="iconfont icon-pause"></text>
+              <text class="pause-text">已暂停</text>
+            </view>
+        
+            <!-- 录制状态指示器 -->
+            <view class="recording-indicator {{showRecordingIndicator ? 'active' : ''}}" animation="{{animationData}}">
+              <view class="recording-dot"></view>
+              <text class="recording-text">REC</text>
+            </view>
 
       <!-- 控制按钮 -->
       <view class="camera-controls">

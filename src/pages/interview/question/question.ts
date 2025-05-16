@@ -1,4 +1,14 @@
 // pages/interview/question/question.ts
+import { 
+  checkPermission, 
+  getCameraContext, 
+  getRecorderManager,
+  startVideoRecording, 
+  stopVideoRecording, 
+  initSpeechRecognition,
+  startSpeechRecognition,
+  stopSpeechRecognition
+} from '../../utils/media';
 
 // 面试问题类型定义
 interface Question {
@@ -466,37 +476,88 @@ Page({
   
   // 开始语音识别
   startSpeechRecognition() {
-    // 实际项目中应该调用语音识别API
-    // 这里只是模拟效果
-    this.setData({
-      isRecognizing: true
-    });
+    if (!this.data.hasMicrophone) {
+      console.warn('麦克风权限未授权，无法进行语音识别');
+      return;
+    }
     
-    // 模拟实时语音识别结果
-    const recognitionInterval = setInterval(() => {
-      if (this.data.interviewStatus !== 'ongoing') {
-        clearInterval(recognitionInterval);
+    try {
+      // 获取当前问题
+      const currentQuestion = this.data.questions[this.data.currentQuestionIndex];
+      
+      // 初始化语音识别状态
+      this.setData({
+        isRecognizing: true,
+        recognitionResult: ''
+      });
+      
+      // 加载插件
+      const plugin = requirePlugin('WechatSI');
+      if (!plugin) {
+        console.error('未找到语音识别插件');
         return;
       }
       
-      // 模拟语音识别结果
-      const currentQuestion = this.data.questions[this.data.currentQuestionIndex];
-      const responses = [
-        '我认为这个问题很重要...',
-        '根据我的经验，我会...',
-        '这个问题涉及到多个方面...',
-        '我曾经处理过类似的情况...',
-        '从技术角度来看，我认为...'
-      ];
+      // 获取全局唯一的语音识别管理器
+      const manager = plugin.getRecognitionManager();
       
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      // 设置事件处理
+      manager.onStart = () => {
+        console.log('语音识别开始');
+      };
       
-      this.setData({
-        recognitionResult: this.data.recognitionResult 
-          ? this.data.recognitionResult + ' ' + randomResponse
-          : randomResponse
+      manager.onRecognize = (res: any) => {
+        // 实时更新识别结果
+        if (res && res.result) {
+          this.setData({
+            recognitionResult: res.result
+          });
+        }
+      };
+      
+      manager.onStop = (res: any) => {
+        console.log('语音识别结束', res);
+        // 保存最终识别结果
+        if (res && res.result) {
+          this.setData({
+            recognitionResult: res.result,
+            isRecognizing: false
+          });
+          
+          // 更新问题答案
+          const questions = this.data.questions;
+          questions[this.data.currentQuestionIndex].answer = res.result;
+          this.setData({ questions });
+        }
+      };
+      
+      manager.onError = (error: any) => {
+        console.error('语音识别错误', error);
+        this.setData({ isRecognizing: false });
+        
+        wx.showToast({
+          title: '语音识别出错',
+          icon: 'error'
+        });
+      };
+      
+      // 开始识别
+      manager.start({
+        lang: 'zh_CN',
+        duration: currentQuestion.duration * 1000
       });
-    }, 5000); // 每5秒更新一次，模拟实时识别
+      
+      // 保存管理器实例
+      this.setData({ recognitionManager: manager });
+    } catch (error) {
+      console.error('启动语音识别失败', error);
+      this.setData({ isRecognizing: false });
+      
+      wx.showToast({
+        title: '语音识别启动失败',
+        icon: 'error'
+      });
+    }
   },
   
   // 停止语音识别
