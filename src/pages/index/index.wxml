@@ -1,18 +1,5 @@
 <!--index.wxml-->
 <view class="container">
-  <!-- 顶部用户信息区域 -->
-  <view class="user-info-section">
-    <block wx:if="{{!hasUserInfo}}">
-      <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-        <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-      </button>
-      <input type="nickname" class="nickname-input" placeholder="请输入昵称" bindchange="onInputChange" />
-    </block>
-    <block wx:else>
-      <image class="avatar" src="{{userInfo.avatarUrl}}" bindtap="navigateToProfile"></image>
-      <text class="nickname">{{userInfo.nickName}}</text>
-    </block>
-  </view>
 
   <!-- 欢迎语 -->
   <view class="welcome-section">
@@ -23,11 +10,8 @@
   <!-- 主要功能区域 -->
   <view class="function-section">
     <!-- 开始面试按钮 -->
-    <button class="primary-btn" bindtap="startInterview" wx:if="{{hasUserInfo}}">
+    <button class="primary-btn" bindtap="startInterview">
       开始模拟面试
-    </button>
-    <button class="primary-btn" bindtap="getUserProfile" wx:else>
-      登录开始体验
     </button>
 
     <!-- 功能卡片列表 -->

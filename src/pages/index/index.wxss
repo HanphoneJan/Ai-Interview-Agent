@@ -8,48 +8,7 @@
 
 /* 用户信息区域 */
 .user-info-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40rpx 0;
-  background-color: #ffffff;
-  border-radius: 16rpx;
-  margin-bottom: 30rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
-}
-
-.avatar-wrapper {
-  padding: 0;
-  width: 160rpx !important;
-  height: 160rpx !important;
-  border-radius: 50%;
-  margin-bottom: 20rpx;
-  background-color: transparent;
-}
-
-.avatar-wrapper::after {
-  border: none;
-}
-
-.avatar {
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 50%;
-  border: 2rpx solid #f0f0f0;
-}
-
-.nickname-input {
-  text-align: center;
-  font-size: 32rpx;
-  color: #333333;
-  padding: 10rpx 0;
-  width: 300rpx;
-}
-
-.nickname {
-  font-size: 32rpx;
-  color: #333333;
-  margin-top: 20rpx;
+  /* 添加你的用户信息区域样式 */
 }
 
 /* 欢迎语区域 */
