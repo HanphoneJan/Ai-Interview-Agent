@@ -19,44 +19,7 @@
   text-align: center;
 }
 
-/* 未登录状态 */
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 100rpx 0;
-  background-color: #ffffff;
-  margin: 30rpx;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
-}
-
-.default-avatar {
-  width: 150rpx;
-  height: 150rpx;
-  border-radius: 50%;
-  margin-bottom: 30rpx;
-  background-color: #f0f0f0;
-}
-
-.login-text {
-  font-size: 32rpx;
-  color: #666666;
-  margin-bottom: 40rpx;
-}
-
-.login-btn {
-  width: 60%;
-  height: 80rpx;
-  line-height: 80rpx;
-  background-color: #07c160;
-  color: #ffffff;
-  font-size: 30rpx;
-  border-radius: 40rpx;
-}
-
-/* 已登录状态 */
+/* 用户信息区域 */
 .user-info-section {
   display: flex;
   align-items: center;
@@ -67,15 +30,12 @@
   box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 
-.avatar-container {
-  margin-right: 30rpx;
-}
-
 .avatar {
   width: 120rpx;
   height: 120rpx;
   border-radius: 50%;
   border: 2rpx solid #f0f0f0;
+  margin-right: 30rpx;
 }
 
 .info-container {
@@ -83,8 +43,6 @@
 }
 
 .name-container {
-  display: flex;
-  align-items: center;
   margin-bottom: 10rpx;
 }
 
@@ -92,25 +50,31 @@
   font-size: 36rpx;
   font-weight: bold;
   color: #333333;
-  margin-right: 10rpx;
-}
-
-.name-input {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333333;
-  border-bottom: 2rpx solid #07c160;
-  padding: 0 10rpx;
-  width: 300rpx;
-}
-
-.edit-icon {
-  padding: 10rpx;
 }
 
 .nickname {
   font-size: 28rpx;
   color: #999999;
+}
+
+/* 登录按钮 */
+.login-btn-container {
+  padding: 0 30rpx;
+  margin-top: 20rpx;
+}
+
+.login-btn {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  background-color: #07c160;
+  color: #ffffff;
+  font-size: 30rpx;
+  border-radius: 40rpx;
+}
+
+.login-btn::after {
+  border: none;
 }
 
 /* 功能区 */
@@ -170,11 +134,6 @@
   color: #666666;
 }
 
-.icon-edit, .icon-check {
-  font-size: 32rpx;
-  color: #07c160;
-}
-
 .icon-file, .icon-history {
   color: #07c160;
 }
@@ -182,4 +141,29 @@
 .icon-right {
   font-size: 28rpx;
   color: #cccccc;
+}
+
+
+/* 新增样式 */
+.avatar-btn {
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  line-height: 1;
+}
+.avatar-btn::after {
+  border: none;
+}
+
+.default-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.nickname-input {
+  border-bottom: 1px solid #07c160;
+  padding: 10rpx;
+  font-size: 32rpx;
+  width: 200rpx;
 }
