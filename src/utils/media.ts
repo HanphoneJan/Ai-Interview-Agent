@@ -24,9 +24,13 @@ export function getRecorderManager(): WechatMiniprogram.RecorderManager {
  * @param cameraId 相机组件ID
  * @returns 相机上下文实例
  */
-export function getCameraContext(cameraId: string): WechatMiniprogram.CameraContext {
+/**
+ * 初始化相机上下文
+ * @returns 相机上下文实例
+ */
+export function getCameraContext(): WechatMiniprogram.CameraContext {
   if (!cameraContext) {
-    cameraContext = wx.createCameraContext(cameraId);
+    cameraContext = wx.createCameraContext();
   }
   return cameraContext;
 }
@@ -60,51 +64,45 @@ export function checkPermission(scope: 'scope.camera' | 'scope.record'): Promise
  * @param options 录音选项
  * @returns Promise<void>
  */
-export function startAudioRecording(options: WechatMiniprogram.RecorderManagerStartOption = {}): Promise<void> {
+export function startAudioRecording(options: Partial<WechatMiniprogram.RecorderManagerStartOption> = {}): Promise<void> {
   return new Promise((resolve, reject) => {
     const recorder = getRecorderManager();
     
-    // 设置默认选项
     const defaultOptions: WechatMiniprogram.RecorderManagerStartOption = {
-      duration: 60000, // 最长录音时间，单位ms
-      sampleRate: 16000, // 采样率
-      numberOfChannels: 1, // 录音通道数
-      encodeBitRate: 48000, // 编码码率
-      format: 'mp3', // 音频格式
-      frameSize: 50 // 指定帧大小，单位KB
+      duration: 60000,
+      sampleRate: 16000,
+      numberOfChannels: 1,
+      encodeBitRate: 48000,
+      format: 'mp3',
+      frameSize: 50
     };
     
-    // 合并选项
     const mergedOptions = { ...defaultOptions, ...options };
     
     recorder.start(mergedOptions);
     
-    recorder.onStart(() => {
-      resolve();
-    });
-    
-    recorder.onError((error) => {
-      reject(error);
-    });
+    recorder.onStart(() => resolve());
+    recorder.onError((error: WechatMiniprogram.GeneralCallbackResult) => reject(error));
   });
 }
 
 /**
  * 停止录音
- * @returns Promise<WechatMiniprogram.RecorderManagerOnStopCallbackResult> 录音结果
+ * @returns Promise<{tempFilePath: string}>
  */
-export function stopAudioRecording(): Promise<WechatMiniprogram.RecorderManagerOnStopCallbackResult> {
+export function stopAudioRecording(): Promise<{tempFilePath: string}> {
   return new Promise((resolve, reject) => {
     const recorder = getRecorderManager();
     
     recorder.onStop((res) => {
-      resolve(res);
+      if (res.tempFilePath) {
+        resolve(res);
+      } else {
+        reject(new Error('录音文件创建失败'));
+      }
     });
     
-    recorder.onError((error) => {
-      reject(error);
-    });
-    
+    recorder.onError((error: WechatMiniprogram.GeneralCallbackResult) => reject(error));
     recorder.stop();
   });
 }
@@ -115,38 +113,62 @@ export function stopAudioRecording(): Promise<WechatMiniprogram.RecorderManagerO
  * @param options 录制选项
  * @returns Promise<void>
  */
-export function startVideoRecording(cameraId: string, options: WechatMiniprogram.CameraContextStartRecordTimeoutOption = {}): Promise<void> {
+export function startVideoRecording(cameraId: string, options: {timeoutCallback?: () => void} = {}): Promise<void> {
   return new Promise((resolve, reject) => {
-    const camera = getCameraContext(cameraId);
+    const camera = getCameraContext();
     
-    // 设置默认选项
-    const defaultOptions: WechatMiniprogram.CameraContextStartRecordTimeoutOption = {
-      timeout: 60000, // 最长录制时间，单位ms
+    camera.startRecord({
+      ...options,
       success: () => resolve(),
-      fail: (error) => reject(error)
-    };
-    
-    // 合并选项
-    const mergedOptions = { ...defaultOptions, ...options };
-    
-    camera.startRecord(mergedOptions);
+      fail: (error: WechatMiniprogram.GeneralCallbackResult) => reject(error)
+    });
   });
 }
 
 /**
  * 停止视频录制
  * @param cameraId 相机组件ID
- * @returns Promise<WechatMiniprogram.CameraContextStopRecordSuccessCallbackResult> 录制结果
+ * @returns Promise<{tempVideoPath: string}>
  */
-export function stopVideoRecording(cameraId: string): Promise<WechatMiniprogram.CameraContextStopRecordSuccessCallbackResult> {
+export function stopVideoRecording(cameraId: string): Promise<{tempVideoPath: string}> {
   return new Promise((resolve, reject) => {
-    const camera = getCameraContext(cameraId);
+    const camera = getCameraContext();
     
     camera.stopRecord({
-      success: (res) => resolve(res),
-      fail: (error) => reject(error)
+      success: (res) => {
+        if (res.tempVideoPath) {
+          resolve(res);
+        } else {
+          reject(new Error('视频文件创建失败'));
+        }
+      },
+      fail: (error: WechatMiniprogram.GeneralCallbackResult) => reject(error)
     });
   });
+}
+
+// 正确的小程序类型扩展声明
+declare global {
+  namespace WechatMiniprogram {
+    interface Wx {
+      getPluginAsync?(options: { plugin: string }): Promise<void>;
+    }
+  }
+}
+
+interface SpeechRecognitionManager {
+  onStart: () => void;
+  onRecognize: (res: any) => void;
+  onStop: (res: {result: string}) => void;
+  onError: (error: any) => void;
+  start: (options: SpeechRecognitionOptions) => void;
+  stop: () => void;
+}
+
+interface SpeechRecognitionOptions {
+  lang?: string;
+  duration?: number;
+  [key: string]: any;
 }
 
 /**
@@ -155,24 +177,20 @@ export function stopVideoRecording(cameraId: string): Promise<WechatMiniprogram.
  */
 export function initSpeechRecognition(): Promise<boolean> {
   return new Promise((resolve) => {
-    // 检查插件是否可用
     if (!wx.getPluginAsync) {
-      console.error('当前微信版本不支持语音识别插件');
+      console.error('当前微信版本不支持插件');
       resolve(false);
       return;
     }
-    
-    // 加载插件
+
     wx.getPluginAsync({
-      plugin: 'WechatSI',
-      success: () => {
-        console.log('语音识别插件加载成功');
-        resolve(true);
-      },
-      fail: (error) => {
-        console.error('语音识别插件加载失败', error);
-        resolve(false);
-      }
+      plugin: 'WechatSI'
+    }).then(() => {
+      console.log('语音识别插件加载成功');
+      resolve(true);
+    }).catch((error: any) => {
+      console.error('语音识别插件加载失败', error);
+      resolve(false);
     });
   });
 }
@@ -180,41 +198,41 @@ export function initSpeechRecognition(): Promise<boolean> {
 /**
  * 开始语音识别
  * @param options 识别选项
- * @returns 识别管理器
+ * @returns 识别管理器或null
  */
-export function startSpeechRecognition(options: any = {}): any {
-  // 获取插件
-  const plugin = requirePlugin('WechatSI');
-  if (!plugin) {
-    console.error('未找到语音识别插件');
+export function startSpeechRecognition(options: {
+  lang?: string;
+  duration?: number;
+  onStart?: () => void;
+  onRecognize?: (res: any) => void;
+  onStop?: (res: {result: string}) => void;
+  onError?: (error: any) => void;
+} = {}): SpeechRecognitionManager | null {
+  try {
+    const plugin = requirePlugin('WechatSI') as {getRecognitionManager: () => SpeechRecognitionManager};
+    const manager = plugin.getRecognitionManager();
+    
+    manager.onStart = options.onStart || (() => {});
+    manager.onRecognize = options.onRecognize || (() => {});
+    manager.onStop = options.onStop || (() => {});
+    manager.onError = options.onError || (() => {});
+    
+    manager.start({
+      lang: options.lang || 'zh_CN',
+      duration: options.duration || 60000
+    });
+    
+    return manager;
+  } catch (error: any) {
+    console.error('语音识别初始化失败', error);
     return null;
   }
-  
-  // 获取全局唯一的语音识别管理器
-  const manager = plugin.getRecognitionManager();
-  
-  // 设置事件处理
-  manager.onStart = options.onStart || function() {};
-  manager.onRecognize = options.onRecognize || function() {};
-  manager.onStop = options.onStop || function() {};
-  manager.onError = options.onError || function() {};
-  
-  // 开始识别
-  manager.start({
-    lang: options.lang || 'zh_CN',
-    duration: options.duration || 60000,
-    ...options
-  });
-  
-  return manager;
 }
 
 /**
  * 停止语音识别
  * @param manager 识别管理器
  */
-export function stopSpeechRecognition(manager: any): void {
-  if (manager) {
-    manager.stop();
-  }
+export function stopSpeechRecognition(manager: SpeechRecognitionManager | null): void {
+  manager?.stop();
 }
