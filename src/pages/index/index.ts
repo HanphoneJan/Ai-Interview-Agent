@@ -1,15 +1,36 @@
 
 // index.ts
-// 获取应用实例
+import { IAppOption } from '../../app'
+
+// 获取应用实例并验证
 const app = getApp<IAppOption>()
+if (!app.requireLogin) {
+  console.error('App实例缺少requireLogin方法')
+  // 开发环境直接抛出错误以便及时发现
+  // if (process.env.NODE_ENV === 'development') {
+  //   throw new Error('App实例缺少requireLogin方法')
+  // }
+}
+
+// 定义岗位接口
+interface Position {
+  id: string;
+  title: string;
+  company?: string;
+  description?: string;
+  requirements?: string[];
+  location?: string;
+  salary?: string;
+  // 根据实际需求添加更多字段
+}
 
 interface IComponentData {
-  motto: string
-  searchValue: string
-  filteredPositions: any[]
-  filteredPositionsCount: number
-  positions: any[]
-  loading: boolean
+  motto: string;
+  searchValue: string;
+  filteredPositions: Position[];
+  filteredPositionsCount: number;
+  positions: Position[];
+  loading: boolean;
 }
 
 Component({
@@ -39,9 +60,17 @@ Component({
     
     // 开始面试
     startInterview() {
-      // 直接跳转到岗位选择页面
-      wx.navigateTo({
-        url: '/pages/interview/position/position'
+      const app = getApp<IAppOption>();
+      app.requireLogin({
+        url: '/pages/interview/position/position',
+        success: () => {
+          wx.navigateTo({
+            url: '/pages/interview/position/position'
+          });
+        },
+        fail: () => {
+          console.log('用户取消登录');
+        }
       });
     },
 
@@ -58,8 +87,17 @@ Component({
     loadPositions() {
       // 这里应该是从API获取数据的逻辑
       // 示例数据
-      const positions = [
-        // 你的岗位数据
+      const positions: Position[] = [
+        {
+          id: '1',
+          title: '前端开发工程师',
+          company: '示例科技有限公司',
+          description: '负责公司前端项目开发',
+          requirements: ['熟悉React', '3年以上经验'],
+          location: '深圳',
+          salary: '15k-25k'
+        }
+        // 更多岗位数据...
       ];
       
       this.setData({

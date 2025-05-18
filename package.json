@@ -7,6 +7,7 @@
   "author": "",
   "license": "",
   "devDependencies": {
+    "@types/node": "^22.15.18",
     "@types/wechat-miniprogram": "^3.4.8",
     "miniprogram-api-typings": "^4.0.7"
   }
