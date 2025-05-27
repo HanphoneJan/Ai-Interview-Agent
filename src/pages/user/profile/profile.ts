@@ -11,42 +11,70 @@ Page({
   },
 
   onLoad() {
-    // 尝试从本地存储获取用户信息
-    const userInfo = wx.getStorageSync('userInfo')
-    const resumeUrl = wx.getStorageSync('resumeUrl')
-    const userName = wx.getStorageSync('userName')
-    
-    if (userInfo) {
+    const app = getApp<IAppOption>();
+    // 检查全局状态和token有效性
+    if (app.globalData.userInfo && app.isTokenValid()) {
       this.setData({
-        userInfo,
-        hasUserInfo: true,
+        userInfo: app.globalData.userInfo,
+        hasUserInfo: true
+      });
+    }
+    
+    // 获取其他存储信息
+    const resumeUrl = wx.getStorageSync('resumeUrl');
+    const userName = wx.getStorageSync('userName');
+    
+    if (resumeUrl || userName) {
+      this.setData({
         resumeUrl,
         userName
-      })
+      });
+    }
+  },
+
+  onShow() {
+    const app = getApp<IAppOption>();
+    // 每次显示页面时检查登录状态
+    if (!app.isTokenValid()) {
+      this.setData({
+        hasUserInfo: false
+      });
     }
   },
 
   // 获取用户授权信息
   getUserProfile() {
+    const app = getApp<IAppOption>();
     wx.getUserProfile({
       desc: '需要您的授权才能获取头像和昵称',
-      success: (res) => {
-        this.setData({
-          userInfo: {
-            avatarUrl: res.userInfo.avatarUrl,
-            nickName: res.userInfo.nickName
+      success: (profileRes) => {
+        // 调用统一的登录方法
+        app.login({
+          success: (userInfo) => {
+            // 更新页面显示
+            this.setData({
+              userInfo: {
+                avatarUrl: profileRes.userInfo.avatarUrl,
+                nickName: profileRes.userInfo.nickName
+              },
+              hasUserInfo: true
+            });
           },
-          hasUserInfo: true
-        })
-        wx.setStorageSync('userInfo', this.data.userInfo)
+          fail: (err) => {
+            wx.showToast({
+              title: '登录失败',
+              icon: 'none'
+            });
+          }
+        });
       },
       fail: (err) => {
         wx.showToast({
-          title: '授权失败',
+          title: '获取用户信息失败',
           icon: 'none'
-        })
+        });
       }
-    })
+    });
   },
 
   // 头像选择回调

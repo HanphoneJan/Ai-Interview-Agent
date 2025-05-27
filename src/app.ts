@@ -114,7 +114,71 @@ App<IAppOption>({
     success?: (userInfo: UserInfo) => void;
     fail?: (err: any) => void;
   }) {
-    // 实现登录逻辑
+    // 显示加载提示
+    wx.showLoading({ title: '登录中...' });
+
+    wx.login({
+      success: (res) => {
+        if (res.code) {
+          // 调用后端接口获取token
+          wx.request({
+            url: 'https://your-api-domain.com/auth/login',
+            method: 'POST',
+            data: {
+              code: res.code
+            },
+            success: (response: any) => {
+              if (response.data.code === 0 && response.data.data) {
+                const { token, expires_in, userInfo } = response.data.data;
+                
+                // 设置全局token
+                this.setToken(token, expires_in);
+                
+                // 设置用户信息
+                this.globalData.userInfo = userInfo;
+                this.globalData.hasUserInfo = true;
+                
+                // 保存用户信息到本地
+                wx.setStorageSync('userInfo', userInfo);
+                
+                wx.hideLoading();
+                options?.success?.(userInfo);
+              } else {
+                wx.hideLoading();
+                wx.showToast({
+                  title: response.data.message || '登录失败',
+                  icon: 'none'
+                });
+                options?.fail?.(new Error(response.data.message));
+              }
+            },
+            fail: (err) => {
+              wx.hideLoading();
+              wx.showToast({
+                title: '网络请求失败',
+                icon: 'none'
+              });
+              options?.fail?.(err);
+            }
+          });
+        } else {
+          wx.hideLoading();
+          wx.showToast({
+            title: '微信登录失败',
+            icon: 'none'
+          });
+          options?.fail?.(new Error('微信登录失败'));
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        wx.showToast({
+          title: '登录失败',
+          icon: 'none'
+        });
+        options?.fail?.(err);
+      }
+    });
   },
 
   requireLogin(options: {
@@ -122,6 +186,44 @@ App<IAppOption>({
     success?: () => void;
     fail?: () => void;
   }) {
-    // 实现需要登录的逻辑
+    if (this.isTokenValid()) {
+      options.success?.();
+      return;
+    }
+
+    // 未登录则直接调用微信登录接口
+    wx.showModal({
+      title: '需要登录',
+      content: '请先登录以继续操作',
+      confirmText: '登录',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          wx.login({
+            success: (loginRes) => {
+              if (loginRes.code) {
+                // 这里应该调用后端接口交换token
+                // 模拟登录成功
+                this.globalData.token = 'generated_token';
+                options.success?.();
+              } else {
+                console.error('微信登录失败:', loginRes.errMsg);
+                options.fail?.();
+              }
+            },
+            fail: (err) => {
+              console.error('调用登录接口失败:', err);
+              options.fail?.();
+            }
+          });
+        } else {
+          options.fail?.();
+        }
+      },
+      fail: (err) => {
+        console.error('显示登录提示失败:', err);
+        options.fail?.();
+      }
+    });
   }
 });

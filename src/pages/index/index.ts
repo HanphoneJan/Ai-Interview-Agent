@@ -62,14 +62,15 @@ Component({
     startInterview() {
       const app = getApp<IAppOption>();
       app.requireLogin({
-        url: '/pages/interview/position/position',
         success: () => {
           wx.navigateTo({
             url: '/pages/interview/position/position'
           });
         },
         fail: () => {
-          console.log('用户取消登录');
+          // 登录失败的提示已经在 requireLogin 中处理
+          // 这里可以添加额外的失败处理逻辑
+          console.log('用户取消登录或登录失败');
         }
       });
     },
