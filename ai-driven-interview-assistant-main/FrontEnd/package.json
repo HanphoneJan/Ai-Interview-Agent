@@ -1,0 +1,48 @@
+{
+  "name": "aiDrivenInterviewAssistant",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "homepage": "https://github.com/RohanBhoge/ai-driven-interview-assistance",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "start": "HTTPS=true react-scripts start"
+  },
+  "dependencies": {
+    "@ffmpeg/core": "^0.12.10",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@tailwindcss/vite": "^4.0.0",
+    "axios": "^1.7.9",
+    "event-source-polyfill": "^1.0.31",
+    "openai": "^4.67.1",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.8",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "react-toastify": "^11.0.5",
+    "scroll-lock": "^2.1.5",
+    "webm-to-mp4": "^1.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@tailwindcss/postcss": "^4.0.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.9.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "gh-pages": "^6.1.1",
+    "globals": "^15.9.0",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^4.0.1",
+    "vite": "^5.4.1"
+  }
+}
