@@ -11,12 +11,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'email', 'username', 'password', 'confirm_password',
-            'student_id', 'major', 'university', 'phone', 'gender',
+             'major', 'university', 'phone', 'gender',
         ]
 
     def validate(self, data):
-        if data['password'] != data['confirm_password']:
-            raise serializers.ValidationError("两次输入的密码不一致")
+        email = data.get('email')
+        password = data.get('password')
+
+        if email and password:
+            user = authenticate(request=self.context.get('request'), email=email, password=password)
+            if not user:
+                raise serializers.ValidationError("用户不存在或密码错误")
+        else:
+            raise serializers.ValidationError("必须提供邮箱和密码")
+
+        data['user'] = user
         return data
 
     def create(self, validated_data):

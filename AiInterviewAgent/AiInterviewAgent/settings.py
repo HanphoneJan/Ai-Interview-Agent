@@ -35,7 +35,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'  # 替换为您的SMTP服务器
 EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
+EMAIL_USE_TLS = False
 EMAIL_HOST_USER = 'Janhizian@163.com'  # 替换为您的邮箱
 EMAIL_HOST_PASSWORD = 'YXFFINUMIHWISXBG'  # SMTP授权码
 DEFAULT_FROM_EMAIL = 'Janhizian@163.com'
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.postgres",
     'rest_framework',
+    'rest_framework_simplejwt',
     # 添加应用模块
     "accounts",
     "interview_scenarios",
@@ -59,6 +61,12 @@ INSTALLED_APPS = [
     "evaluation_system",
     "feedback_report",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

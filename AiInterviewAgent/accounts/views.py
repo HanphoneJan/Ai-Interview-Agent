@@ -1,7 +1,6 @@
 # accounts/views.py
 from django.core.mail import send_mail
 from rest_framework import status
-import logging
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -19,7 +18,7 @@ from .tokens import email_verification_token
 import random
 import string
 from django.utils import timezone  # 导入时区模块
-
+from rest_framework_simplejwt.tokens import AccessToken,RefreshToken
 class UserRegistrationView(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -55,10 +54,17 @@ class UserLoginView(APIView):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
-            # 生成 token (使用 DRF 的 Token 或 JWT)
-            # 这里简化处理，实际项目中应使用更安全的认证方式
+
+            # 正确生成访问令牌和刷新令牌
+            access_token = AccessToken.for_user(user)
+            refresh_token = RefreshToken.for_user(user)  # 显式生成刷新令牌
+
             return Response(
-                {"token": user.auth_token.key, "user_id": user.id},
+                {
+                    "access": str(access_token),
+                    "refresh": str(refresh_token),  # 使用refresh_token
+                    "user_id": user.id
+                },
                 status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -124,7 +130,7 @@ class SendVerificationCodeView(APIView):
             # 发送邮件（添加详细日志）
             try:
                 subject = 'AI面试系统 - 邮箱验证码'
-                message = f'您的验证码是：{code}\n有效期5分钟，请不要泄露给他人。'
+                message = f'您的验证码是：{code}\n有效期5分钟，请不要泄露给他人。\n若与您无关，请忽略'
                 # 打印邮件内容到日志（开发环境）
                 print(f"邮件内容: {subject}\n{message}")
 

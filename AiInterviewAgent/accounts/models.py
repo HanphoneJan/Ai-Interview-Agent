@@ -37,7 +37,7 @@ class User(AbstractUser):
     address = models.CharField(max_length=200, blank=True, null=True)
 
     # 邮箱验证
-    is_email_verified = models.BooleanField(default=False)
+    is_email_verified = models.BooleanField(default=True)
 
     # 使用 email 作为认证字段
     USERNAME_FIELD = 'email'
