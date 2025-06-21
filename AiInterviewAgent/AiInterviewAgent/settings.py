@@ -37,6 +37,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
+    'rest_framework',
+    # 添加应用模块
+    "accounts",
+    "interview_scenarios",
+    "multimodal_data",
+    "evaluation_system",
+    "feedback_report",
 ]
 
 MIDDLEWARE = [
@@ -48,6 +56,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# 指定用户模型
+AUTH_USER_MODEL = 'accounts.User'
 
 ROOT_URLCONF = "AiInterviewAgent.urls"
 
