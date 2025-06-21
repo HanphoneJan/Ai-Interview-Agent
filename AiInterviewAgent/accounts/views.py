@@ -1,28 +1,147 @@
 # accounts/views.py
+from django.core.mail import send_mail
 from rest_framework import status
+import logging
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate
-from .serializers import UserRegistrationSerializer, UserLoginSerializer
+from rest_framework.permissions import IsAuthenticated
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+
+from AiInterviewAgent import settings
+from .models import User,EmailVerificationCode
+from .serializers import (
+    UserRegistrationSerializer,
+    UserLoginSerializer,
+    EmailVerificationSerializer
+)
+from .tokens import email_verification_token
+import random
+import string
+from django.utils import timezone  # 导入时区模块
 
 class UserRegistrationView(APIView):
     def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('verification_code')
+
+        # 验证验证码
+        if not email or not code:
+            return Response({'error': '请提供邮箱和验证码'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            record = EmailVerificationCode.objects.get(email=email, is_used=False)
+            if not record.is_valid():
+                return Response({'error': '验证码已过期，请重新获取'}, status=status.HTTP_400_BAD_REQUEST)
+            if record.code != code:
+                return Response({'error': '验证码错误'}, status=status.HTTP_400_BAD_REQUEST)
+        except EmailVerificationCode.DoesNotExist:
+            return Response({'error': '验证码不存在或已被使用'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 验证码验证通过，标记为已使用
+        record.is_used = True
+        record.save()
+
+        # 验证其他注册信息
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'message': '注册成功'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserLoginView(APIView):
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
-            username = serializer.validated_data['username']
-            password = serializer.validated_data['password']
-            user = authenticate(username=username, password=password)
-            if user:
-                token, _ = Token.objects.get_or_create(user=user)
-                return Response({'token': token.key}, status=status.HTTP_200_OK)
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            user = serializer.validated_data['user']
+            # 生成 token (使用 DRF 的 Token 或 JWT)
+            # 这里简化处理，实际项目中应使用更安全的认证方式
+            return Response(
+                {"token": user.auth_token.key, "user_id": user.id},
+                status=status.HTTP_200_OK
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmailVerificationView(APIView):
+    def post(self, request):
+        serializer = EmailVerificationSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                uid = force_str(urlsafe_base64_decode(serializer.validated_data['uid']))  # 修改此处
+                user = User.objects.get(pk=uid)
+            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+                user = None
+
+            if user and email_verification_token.check_token(user, serializer.validated_data['token']):
+                user.is_email_verified = True
+                user.save()
+                return Response({"message": "邮箱验证成功"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "验证链接无效"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # 返回用户个人信息
+        serializer = UserRegistrationSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SendVerificationCodeView(APIView):
+    def post(self, request):
+        try:
+            email = request.data.get('email')
+            if not email:
+                return Response({'error': '请提供邮箱地址'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # 生成6位随机数字验证码
+            code = ''.join(random.choices(string.digits, k=6))
+            expires_at = timezone.now() + timezone.timedelta(minutes=5)
+            print(f"生成验证码 {code} 发送至 {email}")
+
+            # 数据库操作
+            try:
+                record = EmailVerificationCode.objects.get(email=email)
+                record.code = code
+                record.expires_at = expires_at
+                record.is_used = False
+                record.save()
+                print(f"更新验证码记录: {email}")
+            except EmailVerificationCode.DoesNotExist:
+                EmailVerificationCode.objects.create(
+                    email=email,
+                    code=code,
+                    expires_at=expires_at
+                )
+                print(f"创建新验证码记录: {email}")
+
+            # 发送邮件（添加详细日志）
+            try:
+                subject = 'AI面试系统 - 邮箱验证码'
+                message = f'您的验证码是：{code}\n有效期5分钟，请不要泄露给他人。'
+                # 打印邮件内容到日志（开发环境）
+                print(f"邮件内容: {subject}\n{message}")
+
+                # 生产环境发送邮件，开发环境可暂时注释
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=False,
+                )
+
+                return Response({'message': '验证码已发送，请查收邮箱'}, status=status.HTTP_200_OK)
+
+            except Exception as e:
+                print(f"邮件发送失败: {str(e)}")
+                return Response({'error': '发送邮件失败，请稍后重试'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except Exception as e:
+            return Response({'error': '服务器错误，请稍后重试'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

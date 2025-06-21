@@ -16,6 +16,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -27,6 +28,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
+# 邮箱设置
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# 邮件控制台模式，方便测试
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.163.com'  # 替换为您的SMTP服务器
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'Janhizian@163.com'  # 替换为您的邮箱
+EMAIL_HOST_PASSWORD = 'YXFFINUMIHWISXBG'  # SMTP授权码
+DEFAULT_FROM_EMAIL = 'Janhizian@163.com'
+FRONTEND_URL = 'http://localhost:3000'
 
 # Application definition
 
@@ -86,8 +99,12 @@ WSGI_APPLICATION = "AiInterviewAgent.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        'ENGINE': 'django.db.backends.postgresql',
+        "NAME": "ai_interview_agent",
+        'USER': 'postgres',
+        'PASSWORD': '123456',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
