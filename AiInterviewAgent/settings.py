@@ -40,7 +40,10 @@ EMAIL_USE_TLS = False
 EMAIL_HOST_USER = 'Janhizian@163.com'  # 替换为您的邮箱
 EMAIL_HOST_PASSWORD = 'YXFFINUMIHWISXBG'  # SMTP授权码
 DEFAULT_FROM_EMAIL = 'Janhizian@163.com'
-FRONTEND_URL = 'http://localhost:3000'
+FRONTEND_URL = 'http://localhost:1111'
+
+# settings.py
+MEDIASOUP_SERVER_URL = "http://localhost:3000"
 
 # Application definition
 
