@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     'rest_framework',
     'rest_framework_simplejwt',
+    'channels',
     # 添加应用模块
     "accounts",
     "interview_scenarios",
