@@ -1,13 +1,14 @@
 # accounts/views.py
 from django.core.mail import send_mail
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
-
+from rest_framework import status, permissions
+from rest_framework.exceptions import PermissionDenied
 from AiInterviewAgent import settings
+from django.shortcuts import get_object_or_404
 from .models import User,EmailVerificationCode
 from .serializers import (
     UserRegistrationSerializer,
@@ -70,6 +71,7 @@ class UserLoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# 另一种注册方式，目前没有用
 class EmailVerificationView(APIView):
     def post(self, request):
         serializer = EmailVerificationSerializer(data=request.data)
@@ -118,14 +120,12 @@ class SendVerificationCodeView(APIView):
                 record.expires_at = expires_at
                 record.is_used = False
                 record.save()
-                print(f"更新验证码记录: {email}")
             except EmailVerificationCode.DoesNotExist:
                 EmailVerificationCode.objects.create(
                     email=email,
                     code=code,
                     expires_at=expires_at
                 )
-                print(f"创建新验证码记录: {email}")
 
             # 发送邮件（添加详细日志）
             try:
@@ -151,3 +151,73 @@ class SendVerificationCodeView(APIView):
 
         except Exception as e:
             return Response({'error': '服务器错误，请稍后重试'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UserDeleteView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request):
+        """彻底删除用户账户（增强版）"""
+        user_id = request.data.get('user_id', request.user.id)
+        password = request.data.get('password')
+
+        # 权限控制
+        if not request.user.is_staff and user_id != request.user.id:
+            raise PermissionDenied("您没有权限删除其他用户")
+
+        try:
+            user = get_object_or_404(User, id=user_id)
+
+            # 超级管理员保护
+            if user.is_superuser:
+                if request.user != user and not request.user.is_superuser:
+                    raise PermissionDenied("只有超级管理员可以删除其他超级管理员")
+                if request.user == user:
+                    return Response(
+                        {"error": "超级管理员不能删除自己"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            # 自我删除时验证密码
+            if user_id == request.user.id:
+                if not password:
+                    return Response(
+                        {"error": "请提供密码以验证身份"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                if not user.check_password(password):
+                    return Response(
+                        {"error": "密码错误，无法删除账户"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            # 清理关联数据
+            self.clean_related_data(user)
+
+            # 执行彻底删除
+            username = user.username
+            user.delete()
+
+            return Response(
+                {"message": f"用户 {username} 已被彻底删除"},
+                status=status.HTTP_200_OK
+            )
+
+        except PermissionDenied as pd:
+            return Response({"error": str(pd)}, status=status.HTTP_403_FORBIDDEN)
+        except Exception as e:
+            import traceback
+            print(f"删除用户失败: {str(e)}")
+            print(traceback.format_exc())
+            return Response(
+                {"error": f"删除用户失败: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def clean_related_data(self, user):
+        """清理与用户关联的所有数据"""
+        # 清理邮箱验证码
+        EmailVerificationCode.objects.filter(email=user.email).delete()
+
+        # 清理用户令牌（JWT场景无需处理，Token自动过期）
+        # 其他关联数据清理...

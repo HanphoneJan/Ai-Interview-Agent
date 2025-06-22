@@ -4,7 +4,8 @@ from .views import (
     UserRegistrationView,
     UserLoginView,
     EmailVerificationView,
-    UserProfileView, SendVerificationCodeView
+    UserProfileView, SendVerificationCodeView,
+    UserDeleteView
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('verify-email/', EmailVerificationView.as_view(), name='verify-email'),
     path('profile/', UserProfileView.as_view(), name='profile'),
+    path('delete-user/', UserDeleteView.as_view(), name='delete-user'),
 ]
