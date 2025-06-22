@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework import viewsets, permissions
+from .models import FeedbackReport
+from .serializers import FeedbackReportSerializer
 
-# Create your views here.
+class FeedbackReportViewSet(viewsets.ModelViewSet):
+    """反馈报告管理API"""
+    queryset = FeedbackReport.objects.all()
+    serializer_class = FeedbackReportSerializer
+    permission_classes = [permissions.IsAuthenticated]

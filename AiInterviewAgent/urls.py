@@ -21,4 +21,12 @@ from django.urls import path,include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
+    # 面试场景管理
+    path('api/interview/', include('interview_scenarios.urls')),
+    # 多模态数据管理
+    path('api/multimodal-data/', include('multimodal_data.urls')),
+    # 评估系统
+    path('api/evaluation/', include('evaluation_system.urls')),
+    # 反馈报告
+    path('api/feedback/', include('feedback_report.urls')),
 ]
