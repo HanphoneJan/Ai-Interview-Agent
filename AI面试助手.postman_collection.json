@@ -1,0 +1,709 @@
+{
+	"info": {
+		"_postman_id": "d765c32d-ebf2-4324-9052-cc19bd70f6d3",
+		"name": "AI面试助手",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37537144"
+	},
+	"item": [
+		{
+			"name": "用户管理",
+			"item": [
+				{
+					"name": "/api/accounts/send-verification-code/",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"2556997014@qq.com\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/accounts/send-verification-code/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"send-verification-code",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://localhost:8000/api/accounts/send-verification-code/ \\\r\n-H \"Content-Type: application/json\" \\\r\n-d '{\"email\": \"user@example.com\"}'"
+					},
+					"response": []
+				},
+				{
+					"name": "/api/accounts/register/",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"1195560097@qq.com\",\r\n    \"username\": \"newuser\",\r\n    \"password\": \"SecurePass123\",\r\n    \"confirm_password\": \"SecurePass123\",\r\n    \"verification_code\": \"398488\",\r\n    \"major\": \"计算机科学\",\r\n    \"university\": \"示例大学\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/accounts/register/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"register",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://localhost:8000/api/accounts/register/ \\\r\n-H \"Content-Type: application/json\" \\\r\n-d '{\r\n    \"email\": \"user@example.com\",\r\n    \"username\": \"newuser\",\r\n    \"password\": \"SecurePass123\",\r\n    \"confirm_password\": \"SecurePass123\",\r\n    \"verification_code\": \"123456\",  # 从邮箱获取的验证码\r\n    \"student_id\": \"2023001\",\r\n    \"major\": \"计算机科学\",\r\n    \"university\": \"示例大学\"\r\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "/api/accounts/login/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 处理登录响应，提取并存储Token\r",
+									"let responseData = pm.response.json();\r",
+									"\r",
+									"// 检查响应是否成功\r",
+									"if (pm.response.code === 200) {\r",
+									"    // 从响应中提取Token（根据实际响应结构调整）\r",
+									"    let token = responseData.token || responseData.access || responseData.data.token;\r",
+									"    \r",
+									"    if (token) {\r",
+									"        // 存储Token到环境变量（也可存储到全局变量）\r",
+									"        pm.environment.set(\"access\", token);\r",
+									"        \r",
+									"        // 记录Token和过期时间（JWT场景）\r",
+									"        if (responseData.refresh) {\r",
+									"            pm.environment.set(\"refresh\", responseData.refresh);\r",
+									"        }\r",
+									"        \r",
+									"        // 计算Token过期时间（假设有效期24小时）\r",
+									"        let expiresAt = new Date().getTime() + (24 * 60 * 60 * 1000);\r",
+									"        pm.environment.set(\"token_expires_at\", expiresAt);\r",
+									"        \r",
+									"        pm.test(\"Token获取成功\", () => {\r",
+									"            pm.expect(token).to.not.be.empty;\r",
+									"        });\r",
+									"        \r",
+									"    } else {\r",
+									"        pm.test(\"响应中包含Token\", () => {\r",
+									"            pm.expect(token).to.not.be.undefined;\r",
+									"        });\r",
+									"    }\r",
+									"} else {\r",
+									"    pm.test(\"登录请求成功\", () => {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"    \r",
+									"    // 错误处理\r",
+									"    let errorMsg = responseData.error || \"登录失败，请检查用户名和密码\";\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"1195560097@qq.com\",\r\n    \"password\": \"SecurePass123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/accounts/login/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"login",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://localhost:8000/api/accounts/login/ \\\r\n-H \"Content-Type: application/json\" \\\r\n-d '{\r\n    \"email\": \"test@example.com\",\r\n    \"password\": \"SecurePass123\"\r\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "/api/accounts/delete-user/",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// 自动添加Token到请求头\r",
+									"let authToken = pm.environment.get(\"access\");\r",
+									"let tokenExpiresAt = pm.environment.get(\"token_expires_at\");\r",
+									"let now = new Date().getTime();\r",
+									"\r",
+									"// 检查Token是否存在且未过期\r",
+									"if (authToken && tokenExpiresAt && now < tokenExpiresAt) {\r",
+									"    // 添加Token到请求头（根据认证方式调整）\r",
+									"    pm.request.headers.upsert({\r",
+									"        key: \"Authorization\",\r",
+									"        //value: \"Token \" + authToken  // 适用于Token认证\r",
+									"        value: \"Bearer \" + authToken  // 适用于JWT认证\r",
+									"    });\r",
+									"    \r",
+									"} else {\r",
+									"  \r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token your_token"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"password\": \"SecurePass123\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/accounts/delete-user/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"delete-user",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X DELETE http://localhost:8000/api/accounts/delete/ \\\r\n-H \"Authorization: Token your_token\" \\\r\n-H \"Content-Type: application/json\" \\\r\n-d '{\"password\": \"SecurePass123\"}'"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "面试场景",
+			"item": [
+				{
+					"name": "创建场景/api/interview/scenarios/",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"数据科学家面试\", \"technology_field\": \"Data Science\", \"description\": \"考察机器学习、统计分析和Python\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/interview/scenarios/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"scenarios",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST \"$BASE_URL/scenarios/\" \\\r\n-H \"Authorization: Bearer $JWT_TOKEN\" \\\r\n-H \"Content-Type: application/json\" \\\r\n-d '{\"name\": \"数据科学家面试\", \"technology_field\": \"Data Science\", \"description\": \"考察机器学习、统计分析和Python\"}'"
+					},
+					"response": []
+				},
+				{
+					"name": "获取全部场景/api/interview/scenarios/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/interview/scenarios/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"scenarios",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"$BASE_URL/scenarios/\" \\\r\n-H \"Authorization: Bearer $JWT_TOKEN\""
+					},
+					"response": []
+				},
+				{
+					"name": "更新场景/api/interview/scenarios/1/",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"description\": \"考察机器学习、统计分析、Python和SQL\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/interview/scenarios/1/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"scenarios",
+								"1",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X PATCH \"$BASE_URL/scenarios/1/\" \\\r\n-H \"Authorization: Bearer $JWT_TOKEN\" \\\r\n-H \"Content-Type: application/json\" \\\r\n-d '{\"description\": \"考察机器学习、统计分析、Python和SQL\"}'"
+					},
+					"response": []
+				},
+				{
+					"name": "删除场景/api/interview/scenarios/3/",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/interview/scenarios/1/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"scenarios",
+								"1",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X DELETE \"$BASE_URL/scenarios/3/\" \\\n-H \"Authorization: Bearer $JWT_TOKEN\""
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"// 自动添加Token到请求头\r",
+							"let authToken = pm.environment.get(\"access\");\r",
+							"let tokenExpiresAt = pm.environment.get(\"token_expires_at\");\r",
+							"let now = new Date().getTime();\r",
+							"\r",
+							"// 检查Token是否存在且未过期\r",
+							"if (authToken && tokenExpiresAt && now < tokenExpiresAt) {\r",
+							"    // 添加Token到请求头（根据认证方式调整）\r",
+							"    pm.request.headers.upsert({\r",
+							"        key: \"Authorization\",\r",
+							"        //value: \"Token \" + authToken  // 适用于Token认证\r",
+							"        value: \"Bearer \" + authToken  // 适用于JWT认证\r",
+							"    });\r",
+							"    \r",
+							"} else {\r",
+							"  \r",
+							"}"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "面试会话",
+			"item": [
+				{
+					"name": "获取当前用户的会话列表/api/interview/sessions/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/interview/sessions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"sessions",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"$BASE_URL/sessions/\" \\\r\n-H \"Authorization: Bearer $JWT_TOKEN\""
+					},
+					"response": []
+				},
+				{
+					"name": "获取下一个问题/api/interview/sessions/1/next_question/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/interview/sessions/4/next_question/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"sessions",
+								"4",
+								"next_question",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"$BASE_URL/sessions/1/next-question/\" \\\r\n-H \"Authorization: Bearer $JWT_TOKEN\""
+					},
+					"response": []
+				},
+				{
+					"name": "获取特定会话详情/api/interview/sessions/1/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/interview/sessions/4/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"sessions",
+								"4",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"$BASE_URL/sessions/1/\" \\\r\n-H \"Authorization: Bearer $JWT_TOKEN\""
+					},
+					"response": []
+				},
+				{
+					"name": "开启面试，创建会话/api/interview/sessions/",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"scenario_id\": 2}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/interview/sessions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"sessions",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST \"$BASE_URL/sessions/\" \\\n-H \"Authorization: Bearer $JWT_TOKEN\" \\\n-H \"Content-Type: application/json\" \\\n-d '{\"scenario_id\": 1}'"
+					},
+					"response": []
+				},
+				{
+					"name": "获取全部问题/api/interview/questions/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/interview/questions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"questions",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"$BASE_URL/questions/\" \\\r\n-H \"Authorization: Bearer $JWT_TOKEN\""
+					},
+					"response": []
+				},
+				{
+					"name": "获取特定问题/api/interview/questions/1/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer $JWT_TOKEN"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/interview/questions/1/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"interview",
+								"questions",
+								"1",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"$BASE_URL/questions/1/\" \\\r\n-H \"Authorization: Bearer $JWT_TOKEN\""
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"// 自动添加Token到请求头\r",
+							"let authToken = pm.environment.get(\"access\");\r",
+							"let tokenExpiresAt = pm.environment.get(\"token_expires_at\");\r",
+							"let now = new Date().getTime();\r",
+							"\r",
+							"// 检查Token是否存在且未过期\r",
+							"if (authToken && tokenExpiresAt && now < tokenExpiresAt) {\r",
+							"    // 添加Token到请求头（根据认证方式调整）\r",
+							"    pm.request.headers.upsert({\r",
+							"        key: \"Authorization\",\r",
+							"        //value: \"Token \" + authToken  // 适用于Token认证\r",
+							"        value: \"Bearer \" + authToken  // 适用于JWT认证\r",
+							"    });\r",
+							"    \r",
+							"} else {\r",
+							"  \r",
+							"}"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
