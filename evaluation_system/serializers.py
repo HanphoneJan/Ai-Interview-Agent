@@ -1,9 +1,9 @@
+# evaluation_system/serializers.py
 from rest_framework import serializers
 from .models import ResponseAnalysis, AnswerEvaluation, OverallInterviewEvaluation
 from multimodal_data.models import ResponseMetadata
 from interview_scenarios.models import InterviewQuestion, InterviewSession
 from accounts.models import User
-
 
 class ResponseAnalysisSerializer(serializers.ModelSerializer):
     metadata = serializers.PrimaryKeyRelatedField(
@@ -13,7 +13,6 @@ class ResponseAnalysisSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResponseAnalysis
         fields = '__all__'
-
 
 class AnswerEvaluationSerializer(serializers.ModelSerializer):
     question = serializers.PrimaryKeyRelatedField(
@@ -30,7 +29,6 @@ class AnswerEvaluationSerializer(serializers.ModelSerializer):
         model = AnswerEvaluation
         fields = '__all__'
 
-
 class OverallInterviewEvaluationSerializer(serializers.ModelSerializer):
     session = serializers.PrimaryKeyRelatedField(
         queryset=InterviewSession.objects.all()
@@ -42,3 +40,11 @@ class OverallInterviewEvaluationSerializer(serializers.ModelSerializer):
     class Meta:
         model = OverallInterviewEvaluation
         fields = '__all__'
+
+    def validate(self, data):
+        # 确保各项能力评分在1-10分之间
+        for field in ['professional_knowledge', 'skill_match', 'language_expression', 'logical_thinking', 'innovation', 'stress_response']:
+            value = data.get(field)
+            if value is not None and (value < 1 or value > 10):
+                raise serializers.ValidationError({field: '评分必须在1-10分之间'})
+        return data

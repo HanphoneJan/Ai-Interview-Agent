@@ -1,8 +1,8 @@
+# evaluation_system/models.py
 from django.db import models
 from interview_scenarios.models import InterviewQuestion, InterviewSession
 from accounts.models import User
 from multimodal_data.models import ResponseMetadata
-
 
 class ResponseAnalysis(models.Model):
     """存储多模态分析结果（语音文本、表情特征等）"""
@@ -18,7 +18,6 @@ class ResponseAnalysis(models.Model):
 
     def __str__(self):
         return f"Analysis for Q{self.metadata.question.question_number}"
-
 
 class AnswerEvaluation(models.Model):
     """单问题回答评估"""
@@ -38,7 +37,6 @@ class AnswerEvaluation(models.Model):
 
     def __str__(self):
         return f"Evaluation for Q{self.question.question_number}"
-
 
 class OverallInterviewEvaluation(models.Model):
     """面试整体评估"""
@@ -66,3 +64,14 @@ class OverallInterviewEvaluation(models.Model):
 
     def __str__(self):
         return f"Overall Evaluation for Session {self.session.id}"
+
+    def clean(self):
+        # 确保各项能力评分在1-10分之间
+        for field in ['professional_knowledge', 'skill_match', 'language_expression', 'logical_thinking', 'innovation', 'stress_response']:
+            value = getattr(self, field)
+            if value < 1 or value > 10:
+                raise ValidationError({field: '评分必须在1-10分之间'})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)

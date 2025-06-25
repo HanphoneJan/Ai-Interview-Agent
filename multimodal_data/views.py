@@ -1,3 +1,4 @@
+# multimodal_data/views.py
 from rest_framework import viewsets, permissions
 from .models import ResponseMetadata
 from .serializers import ResponseMetadataSerializer
@@ -11,3 +12,7 @@ class ResponseMetadataViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # 自动关联当前用户
         serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        """仅返回当前用户的响应元数据"""
+        return self.queryset.filter(question__session__user=self.request.user)
