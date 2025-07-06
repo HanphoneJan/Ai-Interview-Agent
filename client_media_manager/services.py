@@ -2,6 +2,7 @@
 import asyncio
 import logging
 from .models import LiveStreamChunk
+from evaluation_system.audio_engines import recognize
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,13 @@ async def process_live_stream(session_id, chunk, media_type):
 async def trigger_ai_analysis(session_id, chunk, media_type):
     """触发AI分析任务"""
     try:
-        # 调用AI引擎进行分析
-        pass
+        if media_type == "audio":
+            # 调用语音识别引擎
+            result = await recognize(chunk)
+            if result["success"]:
+                logger.info(f"语音识别结果: {result['text']}")
+            else:
+                logger.error(f"语音识别错误: {result['error']}")
+        # 其他媒体类型的分析逻辑可以在这里添加
     except Exception as e:
         logger.error(f"触发AI分析任务出错: {e}")

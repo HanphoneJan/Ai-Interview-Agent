@@ -1,6 +1,6 @@
 # multimodal_data/models.py
 from django.db import models
-from interview_scenarios.models import InterviewQuestion
+from interview_manager.models import InterviewQuestion
 
 class ResponseMetadata(models.Model):
     """存储回答的元数据（不存储实际音视频文件）"""

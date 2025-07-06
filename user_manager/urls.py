@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     UserRegistrationView,
     UserLoginView,
+    LogoutView,
     EmailVerificationView,
     UserProfileView, SendVerificationCodeView,
     UserDeleteView
@@ -14,5 +15,6 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('verify-email/', EmailVerificationView.as_view(), name='verify-email'),
     path('profile/', UserProfileView.as_view(), name='profile'),
+    path('logout/', LogoutView.as_view(), name='logout'),
     path('delete-user/', UserDeleteView.as_view(), name='delete-user'),
 ]

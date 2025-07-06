@@ -13,6 +13,7 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from interview_manager import routing  # 信令路由
+from client_media_manager import routing as client_media_routing
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "AiInterviewAgent.settings")
 
@@ -20,7 +21,7 @@ application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
         URLRouter(
-            routing.websocket_urlpatterns
+            client_media_routing.websocket_urlpatterns  # 使用自定义的路由
         )
     ),
 })

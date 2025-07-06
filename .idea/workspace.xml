@@ -4,7 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="" />
+    <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/client_media_manager/routing.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user_manager/authentication.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user_manager/permissions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/asgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/asgi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/consumers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/migrations/0002_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/feedback_report/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/views.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -80,7 +102,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected="Python.facial_engines">
+  <component name="RunManager" selected="Django 服务器.AiInterviewAgent">
     <configuration name="Test: agent_main" type="DjangoTestsConfigurationType" temporary="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
@@ -278,7 +300,7 @@
     <SUITE FILE_PATH="coverage/AiInterviewAgent$Test__agent_main.coverage" NAME="Test: agent_main 覆盖结果" MODIFIED="1751477574530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/AiInterviewAgent$Test__evaluation_system_tests_EvaluationSystemTestCase.coverage" NAME="Test: evaluation_system.tests.EvaluationSystemTestCase 覆盖结果" MODIFIED="1751365951479" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/AiInterviewAgent$manage.coverage" NAME="manage 覆盖结果" MODIFIED="1751477406117" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/AiInterviewAgent$facial_engines.coverage" NAME="facial_engines 覆盖结果" MODIFIED="1751724723724" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
+    <SUITE FILE_PATH="coverage/AiInterviewAgent$facial_engines.coverage" NAME="facial_engines 覆盖结果" MODIFIED="1751794527434" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
     <SUITE FILE_PATH="coverage/AiInterviewAgent$ai_engines.coverage" NAME="ai_engines 覆盖结果" MODIFIED="1751470116586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
     <SUITE FILE_PATH="coverage/AiInterviewAgent$.coverage" NAME=" 覆盖结果" MODIFIED="1751441253112" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
     <SUITE FILE_PATH="coverage/AiInterviewAgent$audio_engines__1_.coverage" NAME="audio_engines (1) 覆盖结果" MODIFIED="1751724644614" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />

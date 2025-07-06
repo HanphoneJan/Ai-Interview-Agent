@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'channels',
+    'rest_framework_simplejwt.token_blacklist',
     # 添加应用模块
     "user_manager",
     "interview_manager",
@@ -68,10 +69,15 @@ INSTALLED_APPS = [
     "feedback_report",
 ]
 
+# 默认的 JWTAuthentication 会尝试验证所有请求的 Token，但不会主动拒绝请求。
+# 真正的拦截逻辑由权限类控制，IsLoggedInOrExempt 权限类已经能够实现所需的白名单机制，因此可以直接与默认认证类配合使用
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+        'rest_framework_simplejwt.authentication.JWTAuthentication', #拦截请求
+    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'user_manager.permissions.IsLoggedInOrExempt',  # 使用自定义权限类
+    # ]
 }
 
 SIMPLE_JWT = {

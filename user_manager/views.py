@@ -2,14 +2,14 @@
 from django.core.mail import send_mail
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
-from rest_framework import status, permissions
+from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from AiInterviewAgent import settings
 from django.shortcuts import get_object_or_404
-from .models import User,EmailVerificationCode
+from .models import User, EmailVerificationCode
 from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
@@ -18,9 +18,14 @@ from .serializers import (
 from .tokens import email_verification_token
 import random
 import string
-from django.utils import timezone  # 导入时区模块
-from rest_framework_simplejwt.tokens import AccessToken,RefreshToken
+from django.utils import timezone
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+# from .authentication import CustomJWTAuthentication
+# from .permissions import IsLoggedInOrExempt
+
 class UserRegistrationView(APIView):
+    # permission_classes = [IsLoggedInOrExempt]
+    permission_classes = [AllowAny]  # 允许匿名访问
     def post(self, request):
         email = request.data.get('email')
         code = request.data.get('verification_code')
@@ -51,6 +56,8 @@ class UserRegistrationView(APIView):
 
 
 class UserLoginView(APIView):
+    # permission_classes = [IsLoggedInOrExempt]
+    permission_classes = [AllowAny]  # 允许匿名访问
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -73,6 +80,8 @@ class UserLoginView(APIView):
 
 # 另一种注册方式，目前没有用
 class EmailVerificationView(APIView):
+    # permission_classes = [IsLoggedInOrExempt]
+    permission_classes = [AllowAny]  # 允许匿名访问
     def post(self, request):
         serializer = EmailVerificationSerializer(data=request.data)
         if serializer.is_valid():
@@ -93,8 +102,9 @@ class EmailVerificationView(APIView):
 
 
 class UserProfileView(APIView):
-    permission_classes = [IsAuthenticated]
-
+    # authentication_classes = [CustomJWTAuthentication]
+    # permission_classes = [IsLoggedInOrExempt]
+    permission_classes = [IsAuthenticated]  # 需要认证才能访问
     def get(self, request):
         # 返回用户个人信息
         serializer = UserRegistrationSerializer(request.user)
@@ -102,6 +112,8 @@ class UserProfileView(APIView):
 
 
 class SendVerificationCodeView(APIView):
+    # permission_classes = [IsLoggedInOrExempt]
+    permission_classes = [AllowAny]  # 允许匿名访问
     def post(self, request):
         try:
             email = request.data.get('email')
@@ -153,9 +165,31 @@ class SendVerificationCodeView(APIView):
             return Response({'error': '服务器错误，请稍后重试'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class UserDeleteView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]  # 仅认证用户可访问
 
+    def post(self, request):
+        """使当前用户的令牌失效，实现退出登录"""
+        try:
+            # 获取请求中的刷新令牌
+            refresh_token = request.data.get('refresh')
+            if not refresh_token:
+                return Response({'error': '请提供 refresh token'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # 使刷新令牌失效（同时使关联的访问令牌失效）
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # 将令牌加入黑名单
+
+            return Response({'message': '已成功退出登录'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UserDeleteView(APIView):
+    # authentication_classes = [CustomJWTAuthentication]
+    # permission_classes = [IsLoggedInOrExempt]
+    permission_classes = [IsAuthenticated]  # 需要认证才能访问
     def delete(self, request):
         """彻底删除用户账户（增强版）"""
         user_id = request.data.get('user_id', request.user.id)
