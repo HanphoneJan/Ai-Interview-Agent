@@ -143,7 +143,7 @@ class SendVerificationCodeView(APIView):
             # 发送邮件（添加详细日志）
             try:
                 subject = 'AI面试系统 - 邮箱验证码'
-                message = f'您的验证码是：{code}\n有效期5分钟，请不要泄露给他人。\n若与您无关，请忽略'
+                message = f'尊敬的用户，您好！\n您的验证码是：{code}\n。有效期5分钟，请尽快验证，不要泄露给他人。\n若与您无关，请忽略。'
                 # 打印邮件内容到日志（开发环境）
                 print(f"邮件内容: {subject}\n{message}")
 
