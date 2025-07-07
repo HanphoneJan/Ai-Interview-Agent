@@ -20,6 +20,7 @@ import random
 import string
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 # from .authentication import CustomJWTAuthentication
 # from .permissions import IsLoggedInOrExempt
 
@@ -185,6 +186,35 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class TokenRefreshView(APIView):
+    """
+    使用Refresh Token获取新的Access Token
+    """
+    permission_classes = [AllowAny]  # 允许匿名访问，因为用户此时可能只有refresh token
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+
+        if not refresh_token:
+            return Response({'error': '缺少refresh token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # 使用SimpleJWT的RefreshToken类来验证并生成新的access token
+            token = RefreshToken(refresh_token)
+            return Response({
+                'access': str(token.access_token),
+                # 如果需要每次刷新时也生成新的refresh token，可以取消下面的注释
+                # 'refresh': str(token)
+            }, status=status.HTTP_200_OK)
+
+        except TokenError as e:
+            return Response({'error': '无效的refresh token', 'detail': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+        except InvalidToken as e:
+            return Response({'error': 'token格式错误', 'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': '服务器错误，请重试', 'detail': str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class UserDeleteView(APIView):
     # authentication_classes = [CustomJWTAuthentication]
@@ -255,3 +285,5 @@ class UserDeleteView(APIView):
 
         # 清理用户令牌（JWT场景无需处理，Token自动过期）
         # 其他关联数据清理...
+
+
