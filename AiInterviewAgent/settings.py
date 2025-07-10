@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.postgres",
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'channels',
@@ -91,6 +92,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', #跨域
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -104,7 +106,7 @@ MIDDLEWARE = [
 AUTH_USER_MODEL = 'user_manager.User'
 
 ROOT_URLCONF = "AiInterviewAgent.urls"
-
+CORS_ALLOW_ALL_ORIGINS = True  # 允许所有域名进行跨域请求
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
