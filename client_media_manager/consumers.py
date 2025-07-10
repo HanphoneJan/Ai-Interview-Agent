@@ -9,13 +9,32 @@ logger = logging.getLogger(__name__)
 class LiveStreamConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-        self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
+        # 从 scope 中获取 session_id
+        self.session_id = self.scope["url_route"]["kwargs"].get("session_id")
+        logger.info(f"接收到 WebSocket 连接请求，session_id: {self.session_id}")
+
+        if not self.session_id:
+            logger.error("未提供 session_id，关闭连接")
+            await self.close(code=4000)
+            return
+
         self.group_name = f"session_{self.session_id}"
+
+        # 添加到组
         await self.channel_layer.group_add(
             self.group_name,
             self.channel_name
         )
-        logger.info(f"WebSocket连接已建立，会话ID: {self.session_id}")
+
+        # 验证会话（如果需要）
+        if not await self.validate_session():
+            logger.error(f"会话验证失败，session_id: {self.session_id}")
+            await self.close(code=4001)
+            return
+
+        # 接受连接
+        await self.accept()
+        logger.info(f"WebSocket 连接已建立，session_id: {self.session_id}")
 
     async def receive(self, text_data):
         """接收前端发送的媒体数据（二进制或JSON）"""
@@ -96,3 +115,6 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
             "candidate": event["candidate"],
             "sender": event["sender"]
         }))
+
+    async def validate_session(self):
+        pass
