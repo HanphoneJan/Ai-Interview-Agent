@@ -9,5 +9,4 @@ router.register(r'response-metadata', ResponseMetadataViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('', include(websocket_urlpatterns)),
 ]

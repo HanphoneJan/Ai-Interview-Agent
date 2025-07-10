@@ -50,6 +50,7 @@ SERVER_PORT = os.getenv('SERVER_PORT', '5000')
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -92,6 +93,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+
     'corsheaders.middleware.CorsMiddleware', #跨域
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -101,6 +103,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+
+
 
 # 指定用户模型
 AUTH_USER_MODEL = 'user_manager.User'
@@ -122,8 +127,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "AiInterviewAgent.wsgi.application"
-
+# WSGI_APPLICATION = "AiInterviewAgent.wsgi.application"
+ASGI_APPLICATION = "AiInterviewAgent.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -176,6 +181,33 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# settings.py
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {  # 输出到控制台
+            'class': 'logging.StreamHandler',
+        },
+        'file': {  # 输出到文件
+            'class': 'logging.FileHandler',
+            'filename': 'logs/django.log',  # 日志文件路径
+        },
+    },
+    'loggers': {
+        'django': {  # Django框架本身的日志
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        'client_media_manager': {  # 你的应用专属日志（根据你的logger名称配置）
+            'handlers': ['console', 'file'],  # 同时输出到控制台和文件
+            'level': 'DEBUG',  # 调试级别，显示详细日志
+            'propagate': False,  # 不向上传播到django日志
+        },
+    },
+}
+
 
 # 测试
 print("环境变量加载测试:")
