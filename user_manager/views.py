@@ -143,7 +143,7 @@ class SendVerificationCodeView(APIView):
             # 发送邮件（添加详细日志）
             try:
                 subject = 'AI面试系统 - 邮箱验证码'
-                message = f'尊敬的用户，您好！\n您的验证码是：{code}\n。有效期5分钟，请尽快验证，不要泄露给他人。\n若与您无关，请忽略。'
+                message = f'尊敬的用户，您好！\n您的验证码是：{code}。\n有效期5分钟，请尽快验证，不要泄露给他人。\n若与您无关，请忽略。'
                 # 打印邮件内容到日志（开发环境）
                 print(f"邮件内容: {subject}\n{message}")
 
@@ -286,4 +286,80 @@ class UserDeleteView(APIView):
         # 清理用户令牌（JWT场景无需处理，Token自动过期）
         # 其他关联数据清理...
 
+class PasswordResetView(APIView):
+    permission_classes = [AllowAny]  # 允许匿名访问
+
+    def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('verification_code')
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+
+        # 基础参数校验
+        if not all([email, code, new_password, confirm_password]):
+            return Response(
+                {'error': '请提供邮箱、验证码、新密码和确认密码'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 验证验证码有效性
+        try:
+            record = EmailVerificationCode.objects.get(email=email, is_used=False)
+            if not record.is_valid():
+                return Response(
+                    {'error': '验证码已过期，请重新获取'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if record.code != code:
+                return Response(
+                    {'error': '验证码错误'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except EmailVerificationCode.DoesNotExist:
+            return Response(
+                {'error': '验证码不存在或已被使用'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 验证密码格式
+        if len(new_password) < 6:
+            return Response(
+                {'error': '密码长度至少为8位'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if new_password != confirm_password:
+            return Response(
+                {'error': '两次输入的密码不一致'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 验证用户存在性
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(
+                {'error': '该邮箱未注册'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # 执行密码重置
+        try:
+            # 更新密码（自动哈希处理）
+            user.set_password(new_password)
+            user.save()
+
+            # 标记验证码为已使用
+            record.is_used = True
+            record.save()
+
+            return Response(
+                {'message': '密码重置成功，请使用新密码登录'},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            print(f"密码重置失败: {str(e)}")
+            return Response(
+                {'error': '密码重置失败，请稍后重试'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 

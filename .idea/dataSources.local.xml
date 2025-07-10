@@ -38,5 +38,10 @@
       <secret-storage>master_key</secret-storage>
       <schema-mapping />
     </data-source>
+    <data-source name="postgres@localhost [2]" uuid="d212210b-4b88-4893-af08-7a58bfba8f97">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" />
+      <secret-storage>master_key</secret-storage>
+      <schema-mapping />
+    </data-source>
   </component>
 </project>

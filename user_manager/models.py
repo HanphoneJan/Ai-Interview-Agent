@@ -16,18 +16,21 @@ class User(AbstractUser):
         validators=[phone_regex],
         max_length=11,
         blank=True,
-        null=True
+        null=False,
+        unique=True,
+        default=''  # 空字符串作为默认值
     )
-    major = models.CharField(max_length=100, blank=True, null=True)
-    university = models.CharField(max_length=100, blank=True, null=True)
+    major = models.CharField(max_length=100, blank=True, null=False, default='')  # 空字符串作为默认值
+    university = models.CharField(max_length=100, blank=True, null=False, default='汉')  # 空字符串作为默认值
 
     # 个人信息
+    name = models.CharField(max_length=40, blank=True, null=False, default='')  # 空字符串作为默认值
     GENDER_CHOICES = [
         ('M', '男'),
         ('F', '女'),
         ('O', '其他'),
     ]
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=False, default='O')
     ethnicity = models.CharField(max_length=50, blank=True, null=True)
 
     # 地址信息

@@ -7,7 +7,8 @@ from .views import (
     EmailVerificationView,
     UserProfileView, SendVerificationCodeView,
     TokenRefreshView,
-    UserDeleteView
+    UserDeleteView,
+    PasswordResetView
 )
 
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('delete-user/', UserDeleteView.as_view(), name='delete-user'),
+    path('reset-password/', PasswordResetView.as_view(), name='password-reset'),
 ]

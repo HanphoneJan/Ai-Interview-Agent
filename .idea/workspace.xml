@@ -5,11 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/2fb7052c-c702-45ed-96ee-6f40c8faefb0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/2fb7052c-c702-45ed-96ee-6f40c8faefb0.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/2fb7052c-c702-45ed-96ee-6f40c8faefb0/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/2fb7052c-c702-45ed-96ee-6f40c8faefb0/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_media_manager/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/consumers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_media_manager/routing.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/routing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_media_manager/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -280,6 +285,7 @@
       <workItem from="1752124781982" duration="2871000" />
       <workItem from="1752128315569" duration="21000" />
       <workItem from="1752147241132" duration="6461000" />
+      <workItem from="1752159270498" duration="7363000" />
     </task>
     <servers />
   </component>
