@@ -1,10 +1,13 @@
 # evaluation_system/resumes_engines.py
+import hashlib
 import os
 import time
 import asyncio
 import json
 from typing import Dict, Any, Optional
 import logging
+
+import requests
 from alibabacloud_docmind_api20220711.client import Client as DocMindClient
 from alibabacloud_tea_openapi.models import Config
 from alibabacloud_docmind_api20220711.models import SubmitDocParserJobAdvanceRequest, QueryDocParserStatusRequest, \
@@ -191,6 +194,102 @@ def parse_local_resume(file_path: str) -> Dict[str, Any]:
     return parser.parse_resume(file_path)
 
 
+import json
+import requests
+import os
+import logging
+
+logger = logging.getLogger(__name__)
+
+class XunfeiEvaluator:
+    """讯飞API封装类，用于评价简历内容"""
+
+    def __init__(self):
+        """初始化讯飞评价器"""
+        # 从环境变量中获取 API 密钥
+        self.api_key = f"Bearer {os.getenv('XF_SPARK_RPO')}"
+        self.api_url = "https://spark-api-open.xf-yun.com/v1/chat/completions"  # 讯飞Spark API地址
+
+        # 验证环境变量
+        if not self.api_key:
+            raise ValueError("请配置环境变量 XF_API_KEY")
+
+    def evaluate_resume(self, resume_content: str) -> dict:
+        """
+        调用讯飞API评价简历
+
+        Args:
+            resume_content: 简历文本内容
+
+        Returns:
+            讯飞API返回的评价结果
+        """
+        # 构造评价提示词
+        prompt = f"""请从以下几个方面评价这份简历：
+1. 整体结构和逻辑性
+2. 个人信息完整性
+3. 工作/教育经历描述的清晰度
+4. 技能与岗位匹配度（假设申请的是通用岗位）
+5. 存在的问题和改进建议
+
+简历内容：
+{resume_content}"""
+
+        # 构造请求体
+        body = {
+            "model": "Pro",
+            "user": "user_id",
+            "messages": [{"role": "user", "content": prompt}],
+            # 下面是可选参数
+            "stream": True,
+            "tools": [
+                {
+                    "type": "web_search",
+                    "web_search": {
+                        "enable": True,
+                        "search_mode": "deep"
+                    }
+                }
+            ]
+        }
+
+        # 构造请求头
+        headers = {
+            'Authorization': self.api_key,
+            'content-type': "application/json"
+        }
+
+        full_response = ""  # 存储返回结果
+        isFirstContent = True  # 首帧标识
+
+        try:
+            # 发送请求
+            response = requests.post(url=self.api_url, json=body, headers=headers, stream=True)
+            response.raise_for_status()  # 检查HTTP错误状态
+
+            for chunks in response.iter_lines():
+                # 打印返回的每帧内容
+                if (chunks and '[DONE]' not in str(chunks)):
+                    data_org = chunks[6:]
+                    chunk = json.loads(data_org)
+                    text = chunk['choices'][0]['delta']
+
+                    # 判断最终结果状态并输出
+                    if ('content' in text and '' != text['content']):
+                        content = text["content"]
+                        if (True == isFirstContent):
+                            isFirstContent = False
+                        print(content, end="")
+                        full_response += content
+
+            result = {"answer": full_response}
+            logger.info("简历评价成功")
+            return result
+
+        except Exception as e:
+            logger.error(f"调用讯飞API失败: {str(e)}")
+            raise
+
 # 示例用法
 if __name__ == "__main__":
     try:
@@ -198,13 +297,30 @@ if __name__ == "__main__":
         resume_path = r"E:\document-git\document-online\工作\个人简历-电子科技大学-韩子健.pdf"
         result = parse_local_resume(resume_path)
 
-        # 打印解析结果中的Markdown内容
+        # 提取解析结果中的Markdown内容
+        resume_text = ""
         if "Data" in result and "layouts" in result["Data"]:
             for layout in result["Data"]["layouts"]:
-                print(f"Markdown内容:\n{layout.get('markdownContent', '')}")
+                markdown_content = layout.get("markdownContent", "")
+                resume_text += markdown_content + "\n\n"
+                print(f"Markdown内容:\n{markdown_content}")
                 print("-" * 50)
         else:
             print("未找到解析结果中的Markdown内容")
+            exit(1)
+
+        # 调用讯飞API进行简历评价
+        evaluator = XunfeiEvaluator()
+        evaluation = evaluator.evaluate_resume(resume_text)
+
+        # 提取并打印评价结果
+        if "payload" in evaluation and "choices" in evaluation["payload"]:
+            evaluation_text = evaluation["payload"]["choices"][0]["text"][0]["content"]
+            print("\n" + "=" * 50)
+            print("简历评价结果:")
+            print(evaluation_text)
+        else:
+            print("未获取到有效的评价结果")
 
     except Exception as e:
         logger.error(f"简历解析出错: {e}")
