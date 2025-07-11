@@ -2,7 +2,7 @@
 import asyncio
 import logging
 from .models import LiveStreamChunk
-from evaluation_system.audio_engines import recognize
+from evaluation_system.audio_recognize_engines import recognize
 
 logger = logging.getLogger(__name__)
 

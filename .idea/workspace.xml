@@ -5,7 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/evaluation_system/audio_generate_engines.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/ai_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/ai_engines.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/audio_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/audio_recognize_engines.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/pipelines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/pipelines.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/evaluation_system/resumes_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/resumes_engines.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -60,6 +65,7 @@
     "Python 测试.tests.test_generate_signa 的 Python 测试.executor": "Run",
     "Python.ai_engines.executor": "Run",
     "Python.audio_engines (1).executor": "Run",
+    "Python.audio_generate_engines.executor": "Run",
     "Python.facial_engines.executor": "Run",
     "Python.manage.executor": "Run",
     "Python.resumes_engines.executor": "Run",
@@ -83,7 +89,7 @@
     ]
   }
 }]]></component>
-  <component name="RunManager" selected="Python.resumes_engines">
+  <component name="RunManager" selected="Python.audio_generate_engines">
     <configuration name="Test: agent_main" type="DjangoTestsConfigurationType" temporary="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
@@ -105,7 +111,7 @@
       <option name="OPTIONS" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="audio_engines (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="audio_generate_engines" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -119,7 +125,30 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/evaluation_system/audio_engines.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/evaluation_system/audio_generate_engines.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="audio_recognize_engines" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AiInterviewAgent" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/evaluation_system" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\evaluation_system\audio_recognize_engines.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -143,29 +172,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/evaluation_system/facial_engines.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="manage" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AiInterviewAgent" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/manage.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -226,11 +232,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.audio_generate_engines" />
         <item itemvalue="Python.resumes_engines" />
         <item itemvalue="Python.facial_engines" />
-        <item itemvalue="Python.audio_engines (1)" />
+        <item itemvalue="Python.audio_recognize_engines" />
         <item itemvalue="Django 测试.Test: agent_main" />
-        <item itemvalue="Python.manage" />
       </list>
     </recent_temporary>
   </component>
@@ -278,6 +284,7 @@
       <workItem from="1752128315569" duration="21000" />
       <workItem from="1752147241132" duration="6461000" />
       <workItem from="1752159270498" duration="9782000" />
+      <workItem from="1752209093630" duration="2366000" />
     </task>
     <servers />
   </component>
@@ -303,6 +310,7 @@
     <SUITE FILE_PATH="coverage/AiInterviewAgent$ai_engines.coverage" NAME="ai_engines 覆盖结果" MODIFIED="1751470116586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
     <SUITE FILE_PATH="coverage/AiInterviewAgent$.coverage" NAME=" 覆盖结果" MODIFIED="1751441253112" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
     <SUITE FILE_PATH="coverage/AiInterviewAgent$audio_engines__1_.coverage" NAME="audio_engines (1) 覆盖结果" MODIFIED="1751724644614" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
+    <SUITE FILE_PATH="coverage/AiInterviewAgent$audio_generate_engines.coverage" NAME="audio_generate_engines 覆盖结果" MODIFIED="1752211398052" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
     <SUITE FILE_PATH="coverage/AiInterviewAgent$resumes_engines.coverage" NAME="resumes_engines 覆盖结果" MODIFIED="1752169392818" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
   </component>
 </project>
