@@ -8,7 +8,7 @@ from .views import (
     UserProfileView, SendVerificationCodeView,
     TokenRefreshView,
     UserDeleteView,
-    PasswordResetView
+    PasswordResetView, address_api_proxy
 )
 
 urlpatterns = [
@@ -21,4 +21,5 @@ urlpatterns = [
     path('refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('delete-user/', UserDeleteView.as_view(), name='delete-user'),
     path('reset-password/', PasswordResetView.as_view(), name='password-reset'),
+    path('address/', address_api_proxy, name='address_api_proxy'),
 ]

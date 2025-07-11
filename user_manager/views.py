@@ -1,5 +1,8 @@
 # user_manager/views.py
 from django.core.mail import send_mail
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -9,6 +12,8 @@ from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from AiInterviewAgent import settings
 from django.shortcuts import get_object_or_404
+
+from .address import TencentMapService
 from .models import User, EmailVerificationCode
 from .serializers import (
     UserRegistrationSerializer,
@@ -363,3 +368,38 @@ class PasswordResetView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def address_api_proxy(request):
+    """
+    行政区划API代理视图（修正版）
+    移除冗余的action参数，正确处理id参数
+    """
+    try:
+        # 获取并处理id参数（移除可能的空格）
+        parent_id = request.GET.get('id', '').strip()
+        # 空字符串表示获取省份列表，无需传递id参数
+
+        # 初始化地图服务
+        map_service = TencentMapService()
+
+        # 调用服务获取数据（传递None表示不使用id参数）
+        result = map_service.get_districts(parent_id if parent_id else None)
+
+        # 返回结果给前端
+        return JsonResponse(result)
+
+    except ValueError as ve:
+        return JsonResponse({
+            "status": 4001,
+            "message": str(ve),
+            "result": None
+        }, status=400)
+
+    except Exception as e:
+        return JsonResponse({
+            "status": 5000,
+            "message": "服务器内部错误",
+            "result": None
+        }, status=500)

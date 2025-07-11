@@ -7,6 +7,10 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
+from django.contrib.auth.hashers import make_password
+from rest_framework import serializers
+from .models import User  # 假设User模型在models.py中
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
@@ -23,7 +27,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'email': {'required': True},
             'username': {'required': True},
             'name': {'required': True},
-            'phone': {'required': True},  # 手机号必须存在
+            'phone': {'required': True},
         }
 
     def validate(self, data):
@@ -47,28 +51,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data.pop('confirm_password')  # 移除确认密码字段
+        # 移除确认密码字段，不需要保存到数据库
+        validated_data.pop('confirm_password')
 
-        # 创建用户但不保存密码（避免明文存储）
+        # 获取密码并进行哈希处理
+        password = validated_data.pop('password')
+        hashed_password = make_password(password)
+
+        # 创建用户并设置哈希后的密码
         user = User.objects.create(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            major=validated_data.get('major', ''),
-            university=validated_data.get('university', ''),
-            phone=validated_data['phone'],  # 直接使用，不再使用get()
-            gender=validated_data.get('gender', 'O'),
-            name=validated_data.get('name', ''),
-            province=validated_data.get('province'),
-            city=validated_data.get('city'),
-            district=validated_data.get('district'),
-            address=validated_data.get('address'),
-            ethnicity=validated_data.get('ethnicity'),
-            is_email_verified=True  # 新注册用户默认邮箱已经验证
+            password=hashed_password,
+            **validated_data
         )
-
-        # 哈希密码并保存
-        user.set_password(validated_data['password'])
-        user.save()
 
         # 生成邮箱验证令牌
         token = PasswordResetTokenGenerator().make_token(user)
@@ -77,6 +71,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # 这里可以添加发送验证邮件的逻辑
 
         return user
+
+
+from django.contrib.auth import authenticate
+from rest_framework import serializers
+from .models import User
+
 
 class UserLoginSerializer(serializers.Serializer):
     # 移除固定的email字段，改为可选的phone和email（至少提供一个）
@@ -97,32 +97,25 @@ class UserLoginSerializer(serializers.Serializer):
         # 根据提供的字段查询用户
         user = None
         if phone:
-            # 手机号登录：先查询用户是否存在
             try:
                 user = User.objects.get(phone=phone)
             except User.DoesNotExist:
-                pass  # 不直接报错，统一在认证失败时提示
+                pass
         elif email:
-            # 邮箱登录：先查询用户是否存在
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                pass  # 不直接报错，统一在认证失败时提示
+                pass
 
-        # 执行认证（使用用户的USERNAME_FIELD，这里是email）
-        if user:
-            authenticated_user = authenticate(
-                username=user.email,  # 无论用手机号还是邮箱，最终用email作为username参数
-                password=password
-            )
-            if authenticated_user:
-                user = authenticated_user
-            else:
-                user = None  # 密码错误时置空
-
-        # 验证结果处理
-        if not user:
+        # 验证用户是否存在并检查密码
+        if user is None:
             raise serializers.ValidationError("手机号/邮箱或密码错误")
+
+        # 使用Django内置的check_password方法验证密码
+        if not user.check_password(password):
+            raise serializers.ValidationError("手机号/邮箱或密码错误")
+
+        # 检查邮箱是否已验证
         if not user.is_email_verified:
             raise serializers.ValidationError("邮箱尚未验证")
 
