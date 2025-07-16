@@ -1,20 +1,16 @@
 # evaluation_system/resumes_engines.py
-import hashlib
-import os
-import time
-import asyncio
-import json
-from typing import Dict, Any, Optional
-import logging
 
-import requests
+import time
+from typing import Dict, Any, Optional
 from alibabacloud_docmind_api20220711.client import Client as DocMindClient
 from alibabacloud_tea_openapi.models import Config
 from alibabacloud_docmind_api20220711.models import SubmitDocParserJobAdvanceRequest, QueryDocParserStatusRequest, \
     GetDocParserResultRequest
 from alibabacloud_tea_util.models import RuntimeOptions
-from alibabacloud_credentials.client import Client as CredentialClient
 import logging
+import json
+import requests
+import os
 from dotenv import load_dotenv  # 添加dotenv库用于加载环境变量
 
 # 加载.env文件中的环境变量
@@ -194,12 +190,7 @@ def parse_local_resume(file_path: str) -> Dict[str, Any]:
     return parser.parse_resume(file_path)
 
 
-import json
-import requests
-import os
-import logging
 
-logger = logging.getLogger(__name__)
 
 class XunfeiEvaluator:
     """讯飞API封装类，用于评价简历内容"""
@@ -269,15 +260,15 @@ class XunfeiEvaluator:
 
             for chunks in response.iter_lines():
                 # 打印返回的每帧内容
-                if (chunks and '[DONE]' not in str(chunks)):
+                if chunks and '[DONE]' not in str(chunks):
                     data_org = chunks[6:]
                     chunk = json.loads(data_org)
                     text = chunk['choices'][0]['delta']
 
                     # 判断最终结果状态并输出
-                    if ('content' in text and '' != text['content']):
+                    if 'content' in text and '' != text['content']:
                         content = text["content"]
-                        if (True == isFirstContent):
+                        if isFirstContent:
                             isFirstContent = False
                         print(content, end="")
                         full_response += content
