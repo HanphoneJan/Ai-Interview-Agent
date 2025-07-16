@@ -198,7 +198,7 @@ def main():
 
         # 测试流式响应
         print("\n=== 测试流式响应 ===")
-        stream_response = engine.generate_stream_response("请简要介绍一下Python编程语言")
+        stream_response = engine.generate_stream_response("请简要介绍一下Java编程语言")
 
         print("流式输出:")
         for chunk in stream_response:

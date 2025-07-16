@@ -1,4 +1,7 @@
 # interview_manager/services.py
+from interview_manager.models import InterviewScenario
+
+
 def get_media_servers_config(scenario_id):
     """获取场景对应的媒体服务器配置（STUN/TURN地址）"""
     scenario = InterviewScenario.objects.get(id=scenario_id)

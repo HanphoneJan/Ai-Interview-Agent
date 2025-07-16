@@ -1,91 +1,112 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 import logging
+import base64
+
+from evaluation_system.audio_recognize_engines import recognize
+from evaluation_system.video_analyze_engines import analyze_video  # 新增视频分析引擎导入
+from evaluation_system.pipelines import live_evaluation_pipeline
 from .services import process_live_stream
 
 logger = logging.getLogger(__name__)
 
+
 class LiveStreamConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.session_id = None  # 仅保留会话ID属性，无需group相关属性
+        self.session_id = None
+        self.buffer = {}  # 存储媒体块的缓冲区
 
     async def connect(self):
-        # 从 scope 中获取 session_id
         self.session_id = self.scope["url_route"]["kwargs"].get("session_id")
-        logger.info(f"接收到 WebSocket 连接请求，session_id: {self.session_id}")
-
         if not self.session_id:
-            logger.error("未提供 session_id，关闭连接")
             await self.close(code=4000)
             return
 
-        # 接受连接（注意：原代码中调用了两次accept()，这里修正为一次）
+        # 初始化会话缓冲区
+        self.buffer[self.session_id] = {"audio": [], "video": []}
+
         await self.accept()
-        logger.info(f"WebSocket 连接已建立，session_id: {self.session_id}")
+        logger.info(f"WebSocket连接已建立，会话ID: {self.session_id}")
 
     async def receive(self, text_data=None, bytes_data=None):
-        """接收前端发送的媒体数据（二进制或JSON），增加详细调试日志"""
         try:
-            # 记录接收数据的基本信息（区分文本/二进制类型）
             if text_data:
-                logger.debug(
-                    f"接收文本数据 | session_id: {self.session_id} | 数据长度: {len(text_data)} 字符"
-                )
-                try:
-                    # 解析JSON前记录原始数据片段（避免敏感信息，只取前100字符）
-                    raw_data_snippet = text_data[:100] + ("..." if len(text_data) > 100 else "")
-                    logger.debug(f"原始文本数据片段: {raw_data_snippet}")
+                data = json.loads(text_data)
+                message_type = data.get("type")
 
-                    data = json.loads(text_data)
-                    logger.debug(f"JSON解析成功 | 数据结构: {list(data.keys())}")  # 仅记录键名，不暴露值
+                if message_type == "media_chunk":
+                    session_id = data["session_id"]
+                    media_type = data["media_type"]
+                    chunk_id = data.get("chunk_id")  # 媒体块ID，用于重组
+                    is_last = data.get("is_last", False)  # 是否是最后一个块
 
-                    message_type = data.get("type")
-                    logger.debug(f"消息类型: {message_type} | session_id: {data.get('session_id')}")
-
-                    if message_type == "media_chunk":
-                        # 记录媒体块的关键元信息（不记录完整二进制内容）
-                        chunk_info = {
-                            "session_id": data.get("session_id"),
-                            "media_type": data.get("media_type"),
-                            "chunk_length": len(data.get("chunk", ""))  # 记录chunk长度而非内容
-                        }
-                        logger.debug(f"处理媒体数据块 | {chunk_info}")
-
-                        # 处理实时媒体数据块
-                        await process_live_stream(
-                            session_id=data["session_id"],
-                            chunk=data["chunk"],
-                            media_type=data["media_type"]
-                        )
-                        logger.debug(f"媒体数据块处理完成 | session_id: {data['session_id']}")
-
-                    elif message_type == "control":
-                        control_action = data.get("action", "未知操作")
-                        logger.debug(f"处理控制信令 | 操作: {control_action}")
-                        # 可添加控制信令的响应逻辑
-
+                    # 处理Base64编码的媒体数据
+                    if "chunk" in data:
+                        chunk = base64.b64decode(data["chunk"])
                     else:
-                        logger.debug(f"收到未知消息类型: {message_type}")
+                        logger.error(f"媒体块缺少数据字段，session_id: {session_id}")
+                        return
 
-                except json.JSONDecodeError as e:
-                    # 单独捕获JSON解析错误，方便定位格式问题
-                    logger.error(f"JSON解析失败 | 原始数据: {text_data[:200]} | 错误: {str(e)}")
-                except KeyError as e:
-                    # 捕获关键参数缺失错误
-                    logger.error(f"数据缺少必要字段: {str(e)} | 数据: {list(data.keys())}")
+                    # 存储媒体块到缓冲区
+                    self.buffer[session_id][media_type].append(chunk)
+
+                    # 如果是最后一个块或达到一定大小，处理数据
+                    if is_last or len(self.buffer[session_id][media_type]) >= 5:
+                        combined_data = b"".join(self.buffer[session_id][media_type])
+                        self.buffer[session_id][media_type] = []  # 清空缓冲区
+
+                        # 处理不同类型的媒体数据
+                        if media_type == "audio":
+                            # 语音数据处理
+                            result = await recognize(combined_data)
+                            if result["success"]:
+                                speech_text = result["text"]
+                                logger.info(f"语音识别结果: {speech_text[:50]}...")
+
+                                # 调用实时评估流水线
+                                feedback = await live_evaluation_pipeline(
+                                    session_id, combined_data, media_type
+                                )
+                                await self.send(text_data=json.dumps({
+                                    "feedback": feedback,
+                                    "speech_text": speech_text
+                                }))
+                        elif media_type == "video":
+                            # 视频数据处理
+                            analysis = await analyze_video(combined_data)
+                            if analysis["success"]:
+                                logger.info(f"视频分析结果: {analysis['data'][:50]}...")
+
+                                # 调用实时评估流水线
+                                feedback = await live_evaluation_pipeline(
+                                    session_id, combined_data, media_type
+                                )
+                                await self.send(text_data=json.dumps({
+                                    "feedback": feedback,
+                                    "video_analysis": analysis["data"]
+                                }))
+
+                        # 通用媒体流处理
+                        await process_live_stream(session_id, combined_data, media_type)
+
+                elif message_type == "control":
+                    control_action = data.get("action", "未知操作")
+                    logger.info(f"收到控制信令: {control_action}")
+                    # 处理控制信令，如开始/停止录制等
 
             elif bytes_data:
-                # 记录二进制数据的基本信息（长度）
-                logger.debug(f"收到二进制数据 | 长度: {len(bytes_data)} 字节")
-                # 如需处理二进制数据，可在此添加逻辑
+                # 处理原始二进制数据
+                logger.warning("收到原始二进制数据，建议使用Base64编码通过text_data发送")
+                # 可以添加二进制数据处理逻辑
 
-            else:
-                logger.debug("收到空数据，未处理")
-
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON解析失败: {str(e)}")
         except Exception as e:
-            # 捕获其他未预料的错误
-            logger.error(f"接收WebSocket数据出错: {str(e)}", exc_info=True)  # exc_info=True 打印完整堆栈
+            logger.error(f"接收WebSocket数据出错: {str(e)}", exc_info=True)
 
     async def disconnect(self, close_code):
         logger.info(f"WebSocket连接已断开，会话ID: {self.session_id}，关闭代码: {close_code}")
+        # 清理会话缓冲区
+        if self.session_id in self.buffer:
+            del self.buffer[self.session_id]
