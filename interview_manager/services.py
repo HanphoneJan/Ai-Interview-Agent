@@ -1,8 +1,8 @@
 # client_media_manager/services.py
 import asyncio
 import logging
-from .models import LiveStreamChunk
-from evaluation_system.audio_recognize_engines import recognize
+from evaluation_system.models import LiveStreamChunk
+from evaluation_system.audio_recognize_engine import recognize
 
 logger = logging.getLogger(__name__)
 

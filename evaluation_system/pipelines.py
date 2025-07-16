@@ -1,6 +1,6 @@
 # evaluation_system/pipelines.py
-from .audio_recognize_engines import recognize
-from .facial_engines import FacialExpressionAnalyzer
+from .audio_recognize_engine import recognize
+from .facial_engine import FacialExpressionAnalyzer
 import logging
 import asyncio
 

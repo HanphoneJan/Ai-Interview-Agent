@@ -2,7 +2,31 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from interview_manager.models import InterviewQuestion, InterviewSession
 from user_manager.models import User
-from client_media_manager.models import ResponseMetadata
+
+class ResponseMetadata(models.Model):
+    """存储回答的元数据（不存储实际音视频文件）"""
+    question = models.ForeignKey(
+        InterviewQuestion,
+        on_delete=models.CASCADE,
+        related_name='response_metadata'
+    )
+    audio_duration = models.DurationField(null=True, blank=True)  # 音频时长
+    video_duration = models.DurationField(null=True, blank=True)  # 视频时长
+    upload_timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Response Meta for Q{self.question.question_number}"
+
+
+class LiveStreamChunk(models.Model):
+    """存储实时媒体流数据块"""
+    session_id = models.CharField(max_length=255)
+    media_type = models.CharField(max_length=10, choices=[('audio', 'Audio'), ('video', 'Video')])
+    chunk_data = models.BinaryField()
+    received_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chunk for session {self.session_id} - {self.media_type}"
 
 class ResponseAnalysis(models.Model):
     """存储多模态分析结果（语音文本、表情特征等）"""

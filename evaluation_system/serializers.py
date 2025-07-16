@@ -1,7 +1,6 @@
 # evaluation_system/serializers.py
 from rest_framework import serializers
-from .models import ResponseAnalysis, AnswerEvaluation, OverallInterviewEvaluation
-from client_media_manager.models import ResponseMetadata
+from .models import ResponseMetadata,ResponseAnalysis, AnswerEvaluation, OverallInterviewEvaluation
 from interview_manager.models import InterviewQuestion, InterviewSession
 from user_manager.models import User
 

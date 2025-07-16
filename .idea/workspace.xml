@@ -4,7 +4,51 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="" />
+    <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/asgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/asgi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/consumers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/migrations/0002_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/routing.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/routing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_media_manager/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/ai_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/evaluate_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/audio_generate_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/audio_generate_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/audio_recognize_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/audio_recognize_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/facial_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/facial_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0004_rename_innovation_overallinterviewevaluation_motivation_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/pipelines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/pipelines.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/migrations/0002_user_name_alter_user_gender_alter_user_major_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/migrations/0003_alter_user_phone.py" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -38,51 +82,57 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Django 服务器.AiInterviewAgent.executor&quot;: &quot;Run&quot;,
-    &quot;Django 测试.Test: agent_main.executor&quot;: &quot;Run&quot;,
-    &quot;Django 测试.Test: evaluation_system.tests.EvaluationSystemTestCase.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python 测试.Python 测试 (ai_engines.py 内).executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.ai_engines.test_recognition 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.test_resumes_engines.TestResumeParser.test_init_client 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.test_resumes_engines.test_real_check_status 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.test_resumes_engines.test_real_get_result 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.test_resumes_engines.test_real_parse_resume 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.test_resumes_engines.test_real_upload_file 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.test_resumes_engines.test_uploaded_job_id 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.tests.test_analyze_live_audio_success 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.tests.test_analyze_live_audio_timeout 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python 测试.tests.test_generate_signa 的 Python 测试.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ai_engines.executor&quot;: &quot;Run&quot;,
-    &quot;Python.audio_engines (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.audio_generate_engines.executor&quot;: &quot;Run&quot;,
-    &quot;Python.facial_engines.executor&quot;: &quot;Run&quot;,
-    &quot;Python.manage.executor&quot;: &quot;Run&quot;,
-    &quot;Python.resumes_engines.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.pycharm.django.structure.promotion.once.per.project&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/develop_project/Ai-Interview-Agent/AiInterviewAgent&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Django 服务器.AiInterviewAgent.executor": "Run",
+    "Django 测试.Test: agent_main.executor": "Run",
+    "Django 测试.Test: evaluation_system.tests.EvaluationSystemTestCase.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python 测试.Python 测试 (ai_engines.py 内).executor": "Run",
+    "Python 测试.ai_engines.test_recognition 的 Python 测试.executor": "Run",
+    "Python 测试.test_resumes_engines.TestResumeParser.test_init_client 的 Python 测试.executor": "Run",
+    "Python 测试.test_resumes_engines.test_real_check_status 的 Python 测试.executor": "Run",
+    "Python 测试.test_resumes_engines.test_real_get_result 的 Python 测试.executor": "Run",
+    "Python 测试.test_resumes_engines.test_real_parse_resume 的 Python 测试.executor": "Run",
+    "Python 测试.test_resumes_engines.test_real_upload_file 的 Python 测试.executor": "Run",
+    "Python 测试.test_resumes_engines.test_uploaded_job_id 的 Python 测试.executor": "Run",
+    "Python 测试.tests.test_analyze_live_audio_success 的 Python 测试.executor": "Run",
+    "Python 测试.tests.test_analyze_live_audio_timeout 的 Python 测试.executor": "Run",
+    "Python 测试.tests.test_generate_signa 的 Python 测试.executor": "Run",
+    "Python.ai_engines.executor": "Run",
+    "Python.audio_engines (1).executor": "Run",
+    "Python.audio_generate_engines.executor": "Run",
+    "Python.facial_engines.executor": "Run",
+    "Python.manage.executor": "Run",
+    "Python.resumes_engines.executor": "Run",
+    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.pycharm.django.structure.promotion.once.per.project": "true",
+    "data.grip.promo.notification.shown": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "E:/develop_project/Ai-Interview-Agent/AiInterviewAgent",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
     ]
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\interview_manager" />
+    </key>
+  </component>
   <component name="RunManager" selected="Django 服务器.AiInterviewAgent">
-    <configuration name="ai_engines" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="audio_generate_engine" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -96,7 +146,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/evaluation_system/ai_engines.py" />
+      <option name="SCRIPT_NAME" value="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\evaluation_system\audio_generate_engine.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -105,7 +155,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="audio_generate_engines" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="audio_recognize_engine" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -119,7 +169,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/evaluation_system/audio_generate_engines.py" />
+      <option name="SCRIPT_NAME" value="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\evaluation_system\audio_recognize_engine.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -128,7 +178,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="audio_recognize_engines" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="evaluate_engine" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -142,7 +192,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\evaluation_system\audio_recognize_engines.py" />
+      <option name="SCRIPT_NAME" value="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\evaluation_system\evaluate_engine.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -151,7 +201,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="facial_engines" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="facial_engine" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -165,7 +215,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/evaluation_system/facial_engines.py" />
+      <option name="SCRIPT_NAME" value="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\evaluation_system\facial_engine.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -226,7 +276,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.ai_engines" />
+        <item itemvalue="Python.evaluate_engine" />
         <item itemvalue="Python.audio_generate_engines" />
         <item itemvalue="Python.resumes_engines" />
         <item itemvalue="Python.facial_engines" />
@@ -288,6 +338,7 @@
       <workItem from="1752577232416" duration="679000" />
       <workItem from="1752588947605" duration="3917000" />
       <workItem from="1752644481091" duration="8799000" />
+      <workItem from="1752669129329" duration="1751000" />
     </task>
     <servers />
   </component>

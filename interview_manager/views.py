@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from evaluation_system.audio_generate_engines import synthesize
+from evaluation_system.audio_generate_engine import synthesize
 from .models import InterviewScenario, InterviewSession, InterviewQuestion
 from .serializers import InterviewScenarioSerializer, InterviewSessionSerializer, InterviewQuestionSerializer
 import random

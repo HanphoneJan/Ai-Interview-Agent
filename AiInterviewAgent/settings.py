@@ -66,7 +66,6 @@ INSTALLED_APPS = [
     # 添加应用模块
     "user_manager",
     "interview_manager",
-    "client_media_manager",
     "evaluation_system",
 ]
 

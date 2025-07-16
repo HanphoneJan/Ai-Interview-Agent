@@ -7,10 +7,10 @@ import tempfile
 import os
 import asyncio
 
-from evaluation_system.audio_recognize_engines import recognize
-from evaluation_system.facial_engines import FacialExpressionAnalyzer  # 导入表情分析引擎
+from evaluation_system.audio_recognize_engine import recognize
+from evaluation_system.facial_engine import FacialExpressionAnalyzer  # 导入表情分析引擎
 from evaluation_system.pipelines import live_evaluation_pipeline
-from .services import process_live_stream
+from interview_manager.services import process_live_stream
 
 logger = logging.getLogger(__name__)
 
