@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     "interview_manager",
     "client_media_manager",
     "evaluation_system",
-    "feedback_report",
 ]
 
 # 默认的 JWTAuthentication 会尝试验证所有请求的 Token，但不会主动拒绝请求。

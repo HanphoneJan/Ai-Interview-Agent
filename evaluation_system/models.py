@@ -1,4 +1,3 @@
-# evaluation_system/models.py
 from django.core.exceptions import ValidationError
 from django.db import models
 from interview_manager.models import InterviewQuestion, InterviewSession
@@ -58,8 +57,12 @@ class OverallInterviewEvaluation(models.Model):
     skill_match = models.PositiveIntegerField(default=0)
     language_expression = models.PositiveIntegerField(default=0)
     logical_thinking = models.PositiveIntegerField(default=0)
-    innovation = models.PositiveIntegerField(default=0)
     stress_response = models.PositiveIntegerField(default=0)
+    # 新增评分项
+    personality = models.PositiveIntegerField(default=0)  # 性格特质评分
+    motivation = models.PositiveIntegerField(default=0)  # 求职动机评分
+    value = models.PositiveIntegerField(default=0)  # 价值观匹配度评分
+    resume = models.PositiveIntegerField(default=0)  # 简历真实性与匹配度评分
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -67,8 +70,13 @@ class OverallInterviewEvaluation(models.Model):
         return f"Overall Evaluation for Session {self.session.id}"
 
     def clean(self):
-        # 确保各项能力评分在1-10分之间
-        for field in ['professional_knowledge', 'skill_match', 'language_expression', 'logical_thinking', 'innovation', 'stress_response']:
+        # 确保各项能力评分在1-10分之间（包含新增字段）
+        score_fields = [
+            'professional_knowledge', 'skill_match', 'language_expression',
+            'logical_thinking', 'stress_response', 'personality',
+            'motivation', 'value', 'resume'
+        ]
+        for field in score_fields:
             value = getattr(self, field)
             if value < 1 or value > 10:
                 raise ValidationError({field: '评分必须在1-10分之间'})

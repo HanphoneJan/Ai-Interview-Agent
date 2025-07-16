@@ -5,15 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/interview_manager/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client_media_manager/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/consumers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_media_manager/webrtc_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_media_manager/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/ai_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/ai_engines.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/pipelines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/pipelines.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/facial_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/facial_engines.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/test_resumes_engines.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/feedback_report/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/services.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,7 +101,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected="Python.ai_engines">
+  <component name="RunManager" selected="Django 服务器.AiInterviewAgent">
     <configuration name="ai_engines" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
@@ -297,7 +307,7 @@
       <workItem from="1752569191566" duration="28000" />
       <workItem from="1752577232416" duration="679000" />
       <workItem from="1752588947605" duration="3917000" />
-      <workItem from="1752644481091" duration="3287000" />
+      <workItem from="1752644481091" duration="8604000" />
     </task>
     <servers />
   </component>
