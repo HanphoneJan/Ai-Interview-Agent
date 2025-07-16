@@ -11,6 +11,8 @@ from evaluation_system.audio_recognize_engine import recognize
 from evaluation_system.facial_engine import FacialExpressionAnalyzer  # 导入表情分析引擎
 from evaluation_system.pipelines import live_evaluation_pipeline
 from interview_manager.services import process_live_stream
+from evaluation_system.evaluate_engine import spark_ai_engine
+from evaluation_system.audio_generate_engine import synthesize
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,8 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
         self.facial_analyzer = FacialExpressionAnalyzer()  # 初始化表情分析引擎
         self.last_analyze_time = 0  # 上次分析时间，用于定时控制
         self.analysis_interval = 1  # 表情分析时间间隔（秒）
+        self.history = []  # 存储对话历史
+        self.current_question = None  # 存储当前问题
 
     async def connect(self):
         self.session_id = self.scope["url_route"]["kwargs"].get("session_id")
@@ -35,6 +39,9 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
         logger.info(f"WebSocket连接已建立，会话ID: {self.session_id}")
+
+        # 生成第一个问题
+        await self.generate_and_send_question()
 
     async def receive(self, text_data=None, bytes_data=None):
         try:
@@ -71,6 +78,9 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
                                 speech_text = result["text"]
                                 logger.info(f"语音识别结果: {speech_text[:50]}...")
 
+                                # 存储用户回答到历史记录
+                                self.history.append({"role": "user", "content": speech_text})
+
                                 # 调用实时评估流水线
                                 feedback = await live_evaluation_pipeline(
                                     session_id, combined_data, media_type
@@ -79,6 +89,10 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
                                     "feedback": feedback,
                                     "speech_text": speech_text
                                 }))
+
+                                # 评估回答并生成新问题
+                                await self.evaluate_and_generate_question(speech_text)
+
                         elif media_type == "video":
                             # 视频数据处理：定时转图片并分析表情
                             analysis = await self._process_video(combined_data)
@@ -206,3 +220,46 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
         # 清理临时文件
         os.unlink(temp_img_path)
         return analyze_result
+
+    async def generate_and_send_question(self):
+        # 生成问题
+        question_query = "请生成一个面试问题"
+        response = spark_ai_engine.generate_response(question_query, self.history)
+        if response["success"]:
+            self.current_question = response["content"]
+            self.history.append({"role": "assistant", "content": self.current_question})
+
+            # 发送问题文本
+            await self.send(text_data=json.dumps({
+                "question_text": self.current_question
+            }))
+
+            # 生成问题语音
+            audio_result = await synthesize(self.current_question)
+            if audio_result["success"]:
+                audio_data = base64.b64encode(audio_result["audio_data"]).decode()
+                await self.send(text_data=json.dumps({
+                    "question_audio": audio_data
+                }))
+            else:
+                logger.error(f"语音合成失败: {audio_result.get('error', '未知错误')}")
+        else:
+            logger.error(f"生成问题失败: {response['error']}")
+
+    async def evaluate_and_generate_question(self, user_answer):
+        # 评估回答
+        evaluation_query = f"请评估以下回答：{user_answer}"
+        evaluation_response = spark_ai_engine.generate_response(evaluation_query, self.history)
+        if evaluation_response["success"]:
+            evaluation_text = evaluation_response["content"]
+            self.history.append({"role": "assistant", "content": evaluation_text})
+
+            # 发送评估结果
+            await self.send(text_data=json.dumps({
+                "evaluation_text": evaluation_text
+            }))
+
+            # 生成新问题
+            await self.generate_and_send_question()
+        else:
+            logger.error(f"评估回答失败: {evaluation_response['error']}")

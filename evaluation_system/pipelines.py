@@ -3,6 +3,8 @@ from .audio_recognize_engine import recognize
 from .facial_engine import FacialExpressionAnalyzer
 import logging
 import asyncio
+import tempfile
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -11,12 +13,18 @@ async def live_evaluation_pipeline(session_id, media_chunk, media_type):
     analyzer = FacialExpressionAnalyzer()
 
     if media_type == "audio":
-        results["audio"] = await recognize(session_id, media_chunk)
+        # 修正调用，原代码多传了 session_id
+        results["audio"] = await recognize(media_chunk)
     elif media_type == "video":
-        # 假设视频数据是图片的URL，调用 analyze_by_url 方法
-        # 如果是本地文件路径，需要调用 analyze_by_file 方法并修改传入参数
         try:
-            results["video"] = await asyncio.to_thread(analyzer.analyze_by_url, image_url=media_chunk)
+            # 假设视频数据是二进制数据，保存为临时文件进行分析
+            with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as f:
+                f.write(media_chunk)
+                temp_img_path = f.name
+            # 调用 analyze_by_file 方法
+            results["video"] = await asyncio.to_thread(analyzer.analyze_by_file, file_path=temp_img_path)
+            # 删除临时文件
+            os.unlink(temp_img_path)
         except Exception as e:
             logger.error(f"视频分析出错: {e}")
     else:
@@ -53,7 +61,9 @@ def generate_live_feedback(results):
     video_result = results.get("video")
 
     if audio_result:
-        feedback["audio_feedback"] = f"语音内容: {audio_result['text']}, 置信度: {audio_result['confidence']}"
+        # 处理可能不存在的 confidence 字段
+        confidence = audio_result.get('confidence', '未知')
+        feedback["audio_feedback"] = f"语音内容: {audio_result['text']}, 置信度: {confidence}"
     if video_result and video_result["success"]:
         feedback["video_feedback"] = f"视频分析结果: {video_result['data']}"
     return feedback

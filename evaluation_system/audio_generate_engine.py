@@ -149,7 +149,7 @@ async def synthesize(text):
 
 async def synthesis_test():
     """测试语音合成功能"""
-    text = "这是一个语音合成测试。"
+    text = "我是韩子健。"
     result = await synthesize(text)
 
     print("合成结果:")

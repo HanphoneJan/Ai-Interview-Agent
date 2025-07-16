@@ -28,6 +28,7 @@ class LiveStreamChunk(models.Model):
     def __str__(self):
         return f"Chunk for session {self.session_id} - {self.media_type}"
 
+
 class ResponseAnalysis(models.Model):
     """存储多模态分析结果（语音文本、表情特征等）"""
     metadata = models.OneToOneField(
@@ -42,6 +43,7 @@ class ResponseAnalysis(models.Model):
 
     def __str__(self):
         return f"Analysis for Q{self.metadata.question.question_number}"
+
 
 class AnswerEvaluation(models.Model):
     """单问题回答评估"""
@@ -61,6 +63,26 @@ class AnswerEvaluation(models.Model):
 
     def __str__(self):
         return f"Evaluation for Q{self.question.question_number}"
+
+
+class ResumeEvaluation(models.Model):
+    """简历评估信息"""
+    session = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='resume_evaluation'
+    )
+    resume_score = models.PositiveIntegerField(default=0)  # 简历评分
+    resume_summary = models.TextField(blank=True, null=True)  # 简历总结性评价分析
+
+    def clean(self):
+        if self.resume_score < 1 or self.resume_score > 10:
+            raise ValidationError({'resume_score': '评分必须在1-10分之间'})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
 
 class OverallInterviewEvaluation(models.Model):
     """面试整体评估"""
@@ -86,7 +108,6 @@ class OverallInterviewEvaluation(models.Model):
     personality = models.PositiveIntegerField(default=0)  # 性格特质评分
     motivation = models.PositiveIntegerField(default=0)  # 求职动机评分
     value = models.PositiveIntegerField(default=0)  # 价值观匹配度评分
-    resume = models.PositiveIntegerField(default=0)  # 简历真实性与匹配度评分
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -98,7 +119,7 @@ class OverallInterviewEvaluation(models.Model):
         score_fields = [
             'professional_knowledge', 'skill_match', 'language_expression',
             'logical_thinking', 'stress_response', 'personality',
-            'motivation', 'value', 'resume'
+            'motivation', 'value'
         ]
         for field in score_fields:
             value = getattr(self, field)

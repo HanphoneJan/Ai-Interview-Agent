@@ -1,7 +1,5 @@
-# evaluation_system/resumes_engines.py
-
 import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 from alibabacloud_docmind_api20220711.client import Client as DocMindClient
 from alibabacloud_tea_openapi.models import Config
 from alibabacloud_docmind_api20220711.models import SubmitDocParserJobAdvanceRequest, QueryDocParserStatusRequest, \
@@ -11,26 +9,24 @@ import logging
 import json
 import requests
 import os
-from dotenv import load_dotenv  # 添加dotenv库用于加载环境变量
+from dotenv import load_dotenv
 
 # 加载.env文件中的环境变量
 load_dotenv()
 
 # 配置日志
 logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 
 class ResumeParser:
     """阿里云文档解析(大模型版)API封装类，用于解析简历文档"""
 
     def __init__(self, region_id: str = "cn-hangzhou", endpoint: str = "docmind-api.cn-hangzhou.aliyuncs.com"):
-        """
-        初始化解析器
-
-        Args:
-            region_id: 阿里云区域ID
-            endpoint: API端点
-        """
+        """初始化解析器"""
         self.region_id = region_id
         self.endpoint = endpoint
         self.client = self._init_client()
@@ -38,7 +34,6 @@ class ResumeParser:
     def _init_client(self) -> DocMindClient:
         """初始化阿里云API客户端"""
         try:
-            # 从环境变量中获取AccessKey
             access_key_id = os.getenv("ALI_ACCESS_KEY_ID")
             access_key_secret = os.getenv("ALI_ACCESS_KEY_SECRET")
 
@@ -57,20 +52,10 @@ class ResumeParser:
             raise
 
     def upload_file(self, file_path: str, file_name: Optional[str] = None) -> Dict[str, Any]:
-        """
-        上传本地文件到阿里云文档解析API
-
-        Args:
-            file_path: 本地文件路径
-            file_name: 自定义文件名，若不提供则使用原文件名
-
-        Returns:
-            包含业务订单号的响应数据
-        """
+        """上传本地文件到阿里云文档解析API"""
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"文件不存在: {file_path}")
 
-        # 确定文件名
         if not file_name:
             file_name = os.path.basename(file_path)
 
@@ -89,15 +74,7 @@ class ResumeParser:
             raise
 
     def check_status(self, job_id: str) -> Dict[str, Any]:
-        """
-        检查文档解析任务状态
-
-        Args:
-            job_id: 业务订单号
-
-        Returns:
-            包含任务状态的响应数据
-        """
+        """检查文档解析任务状态"""
         try:
             request = QueryDocParserStatusRequest(id=job_id)
             response = self.client.query_doc_parser_status(request)
@@ -109,17 +86,7 @@ class ResumeParser:
             raise
 
     def get_result(self, job_id: str, layout_step_size: int = 100, layout_num: int = 0) -> Dict[str, Any]:
-        """
-        获取文档解析结果
-
-        Args:
-            job_id: 业务订单号
-            layout_step_size: 每次获取的布局块数量
-            layout_num: 起始布局块位置
-
-        Returns:
-            文档解析结果
-        """
+        """获取文档解析结果（支持分页）"""
         try:
             request = GetDocParserResultRequest(
                 id=job_id,
@@ -127,69 +94,99 @@ class ResumeParser:
                 layout_num=layout_num
             )
             response = self.client.get_doc_parser_result(request)
-            logger.info(f"获取任务 {job_id} 结果成功")
+            logger.debug(f"获取任务 {job_id} 第{layout_num//layout_step_size + 1}页结果成功")
             return response.body.to_map()
         except Exception as e:
             logger.error(f"获取解析结果失败: {e}")
             raise
 
-    def parse_resume(self, file_path: str, max_retries: int = 10, retry_interval: int = 5) -> Dict[str, Any]:
-        """
-        完整的简历解析流程：上传-等待-获取结果
-
-        Args:
-            file_path: 简历文件路径
-            max_retries: 最大重试次数
-            retry_interval: 重试间隔(秒)
-
-        Returns:
-            解析后的简历内容
-        """
+    def parse_resume(self, file_path: str, max_retries: int = 10, retry_interval: int = 5) -> Tuple[
+        Dict[str, Any], str]:
+        """完整的简历解析流程：上传-等待-获取结果（修复核心问题）"""
         # 1. 上传文件
         upload_response = self.upload_file(file_path)
         job_id = upload_response["Data"]["Id"]
 
-        # 2. 等待解析完成
+        # 2. 等待解析完成（修复：状态判断大小写匹配API返回值）
         retries = 0
-        status = "Processing"
+        status = "init"  # 初始状态设为小写，匹配API返回格式
 
-        while retries < max_retries and status in ["Init", "Processing"]:
+        while retries < max_retries and status in ["init", "processing"]:  # 改为小写状态值
             if retries > 0:
                 time.sleep(retry_interval)
 
             status_response = self.check_status(job_id)
-            status = status_response["Data"]["Status"]
+            status = status_response["Data"]["Status"].lower()  # 统一转为小写避免大小写问题
             retries += 1
 
-            if status == "Success":
+            if status == "success":
                 logger.info(f"任务 {job_id} 解析成功")
                 break
-            elif status == "Fail":
+            elif status == "fail":
                 error_msg = status_response.get("Message", "解析失败，未提供详细信息")
                 raise Exception(f"任务 {job_id} 解析失败: {error_msg}")
 
         if retries >= max_retries:
             raise TimeoutError(f"等待任务 {job_id} 解析超时")
 
-        # 3. 获取解析结果
-        result = self.get_result(job_id)
-        return result
+        # 3. 获取所有分页解析结果（修复：处理分页，避免内容遗漏）
+        all_layouts = []
+        layout_num = 0
+        layout_step_size = 100  # 每页获取100条布局数据
 
+        while True:
+            result_page = self.get_result(job_id, layout_step_size=layout_step_size, layout_num=layout_num)
+            # 增加分页结果调试信息
+            logger.debug(f"第{layout_num // layout_step_size + 1}页解析结果结构: {list(result_page.keys())}")
 
-def parse_local_resume(file_path: str) -> Dict[str, Any]:
-    """
-    解析本地简历文件的便捷函数
+            # 关键修复：API返回的是复数形式"layouts"而非单数"layout"
+            if "Data" in result_page and "layouts" in result_page["Data"]:
+                page_layouts = result_page["Data"]["layouts"]  # 修复字段名为复数形式
+                logger.debug(f"第{layout_num // layout_step_size + 1}页获取到{len(page_layouts)}条布局数据")
+                all_layouts.extend(page_layouts)
 
-    Args:
-        file_path: 简历文件路径
+                # 若当前页数据小于分页大小，说明已获取全部内容
+                if len(page_layouts) < layout_step_size:
+                    break
+                layout_num += layout_step_size  # 继续获取下一页
+            else:
+                logger.warning(f"第{layout_num // layout_step_size + 1}页未找到有效layouts数据，结构为: {result_page}")
+                break
 
-    Returns:
-        解析后的简历内容
-    """
-    parser = ResumeParser()
-    return parser.parse_resume(file_path)
+        # 4. 提取简历文本内容（支持多字段提取，避免内容丢失）
+        resume_text = ""
+        # 增加布局总数调试信息
+        logger.debug(f"共获取到{len(all_layouts)}条布局数据，开始提取文本内容")
 
+        for idx, layout in enumerate(all_layouts):
+            # 打印每条布局数据的字段结构（调试用）
+            layout_fields = list(layout.keys())
+            logger.debug(f"第{idx + 1}条布局数据包含字段: {layout_fields}")
 
+            # 优先提取markdown内容，若无则提取普通文本（根据API返回调整字段）
+            markdown_content = layout.get("markdownContent", "")
+            text_content = layout.get("text", "")  # 修复：API中实际文本字段是"text"而非"content"
+
+            # 增加单条内容提取调试
+            logger.debug(f"第{idx + 1}条布局：markdown内容长度={len(markdown_content)}，text内容长度={len(text_content)}")
+
+            resume_text += markdown_content + text_content + "\n\n"
+
+        # 增加最终文本长度调试
+        logger.debug(f"提取完成，总文本长度为{len(resume_text)}字符")
+
+        if not resume_text.strip():
+            # 详细调试信息：当未提取到内容时触发
+            error_details = (
+                f"未提取到有效简历内容！详细排查：\n"
+                f"- 布局数据总数：{len(all_layouts)}\n"
+                f"- 最后3条布局字段（若存在）：{[list(layout.keys()) for layout in all_layouts[-3:]] if all_layouts else '无'}\n"
+                f"- 可能的字段名不匹配，请检查API返回的实际字段名"
+            )
+            logger.error(error_details)
+            raise ValueError("未从解析结果中提取到有效的简历内容。请查看日志排查字段名是否匹配或数据是否为空")
+
+        return {"Data": {"layout": all_layouts}}, resume_text  # 返回整合后的结果
 
 
 class XunfeiEvaluator:
@@ -197,41 +194,33 @@ class XunfeiEvaluator:
 
     def __init__(self):
         """初始化讯飞评价器"""
-        # 从环境变量中获取 API 密钥
-        self.api_key = f"Bearer {os.getenv('XF_SPARK_RPO')}"
-        self.api_url = "https://spark-api-open.xf-yun.com/v1/chat/completions"  # 讯飞Spark API地址
+        api_key = os.getenv('XF_SPARK_RPO')
+        if not api_key:
+            raise ValueError("请配置环境变量 XF_SPARK_RPO")
 
-        # 验证环境变量
-        if not self.api_key:
-            raise ValueError("请配置环境变量 XF_API_KEY")
+        self.api_key = f"Bearer {api_key}"
+        self.api_url = "https://spark-api-open.xf-yun.com/v1/chat/completions"
+        self.max_retries = 3
+        self.retry_delay = 2
 
     def evaluate_resume(self, resume_content: str) -> dict:
-        """
-        调用讯飞API评价简历
-
-        Args:
-            resume_content: 简历文本内容
-
-        Returns:
-            讯飞API返回的评价结果
-        """
-        # 构造评价提示词
+        """调用讯飞API评价简历"""
         prompt = f"""请从以下几个方面评价这份简历：
         1. 整体结构和逻辑性
         2. 个人信息完整性
         3. 工作/教育经历描述的清晰度
         4. 技能与岗位匹配度
         5. 存在的问题和改进建议
-        
+
+        最后，请给出一个0-10的评分和一个总结性评价分析，格式必须符合以下示例：评分：8.5。总结性分析评价：xxxx。
+
         简历内容：
         {resume_content}"""
 
-        # 构造请求体
         body = {
             "model": "Pro",
             "user": "user_id",
             "messages": [{"role": "user", "content": prompt}],
-            # 下面是可选参数
             "stream": True,
             "tools": [
                 {
@@ -244,74 +233,128 @@ class XunfeiEvaluator:
             ]
         }
 
-        # 构造请求头
         headers = {
             'Authorization': self.api_key,
             'content-type': "application/json"
         }
 
-        full_response = ""  # 存储返回结果
-        isFirstContent = True  # 首帧标识
+        for attempt in range(self.max_retries):
+            try:
+                full_response = ""
+                isFirstContent = True
 
-        try:
-            # 发送请求
-            response = requests.post(url=self.api_url, json=body, headers=headers, stream=True)
-            response.raise_for_status()  # 检查HTTP错误状态
+                response = requests.post(
+                    url=self.api_url,
+                    json=body,
+                    headers=headers,
+                    stream=True,
+                    timeout=30
+                )
+                response.raise_for_status()
 
-            for chunks in response.iter_lines():
-                # 打印返回的每帧内容
-                if chunks and '[DONE]' not in str(chunks):
-                    data_org = chunks[6:]
-                    chunk = json.loads(data_org)
-                    text = chunk['choices'][0]['delta']
+                for chunks in response.iter_lines():
+                    if chunks and '[DONE]' not in str(chunks):
+                        data_org = chunks[6:]
+                        try:
+                            chunk = json.loads(data_org)
+                            text = chunk['choices'][0]['delta']
 
-                    # 判断最终结果状态并输出
-                    if 'content' in text and '' != text['content']:
-                        content = text["content"]
-                        if isFirstContent:
-                            isFirstContent = False
-                        print(content, end="")
-                        full_response += content
+                            if 'content' in text and text['content']:
+                                content = text["content"]
+                                if isFirstContent:
+                                    isFirstContent = False
+                                logger.debug(content)
+                                full_response += content
 
-            result = {"answer": full_response}
-            logger.info("简历评价成功")
-            return result
+                        except json.JSONDecodeError as e:
+                            logger.warning(f"JSON解析错误: {e}")
+                            continue
 
-        except Exception as e:
-            logger.error(f"调用讯飞API失败: {str(e)}")
-            raise
+                score = None
+                summary = None
+                lines = full_response.split('\n')
+                for line in lines:
+                    if "评分：" in line:
+                        try:
+                            score_text = line.split("评分：")[-1].strip()
+                            # 关键修改：使用float()而非int()，并保留两位小数
+                            score = round(float(score_text), 1)
+                            print(f"提取到分数: {score}")
+                        except ValueError as e:
+                            print(f"解析分数失败: {e}, 原始文本: {line}")
+                            score = 0  # 设置默认值
 
-# 示例用法
-if __name__ == "__main__":
+                    elif "总结性分析评价：" in line:
+                        # 提取冒号后的所有内容（包括换行符）
+                        summary_start = line.index("总结性分析评价：") + len("总结性分析评价：")
+                        summary = line[summary_start:].strip()
+
+                        # 如果总结内容跨越多行，继续收集后续行
+                        next_idx = lines.index(line) + 1
+                        while next_idx < len(lines):
+                            summary += "\n" + lines[next_idx].strip()
+                            next_idx += 1
+
+                if score is None:
+                    score = 0
+                if not summary:
+                    summary = "无有效评价"
+
+                result = {
+                    "answer": full_response,
+                    "score": score,
+                    "summary": summary
+                }
+                logger.info("简历评价成功")
+                return result
+
+            except Exception as e:
+                logger.warning(f"讯飞API调用失败 (尝试 {attempt + 1}/{self.max_retries}): {str(e)}")
+                if attempt < self.max_retries - 1:
+                    time.sleep(self.retry_delay)
+                else:
+                    raise Exception(f"讯飞API调用失败，已达到最大重试次数: {str(e)}")
+
+
+def evaluate_resume_file(file_path: str) -> Dict[str, Any]:
+    """完整的简历解析和评价流程"""
     try:
-        # 替换为实际的简历文件路径
-        resume_path = r"E:\document-git\document-online\工作\个人简历-电子科技大学-韩子健.pdf"
-        result = parse_local_resume(resume_path)
-
-        # 提取解析结果中的Markdown内容
-        resume_text = ""
-        if "Data" in result and "layouts" in result["Data"]:
-            for layout in result["Data"]["layouts"]:
-                markdown_content = layout.get("markdownContent", "")
-                resume_text += markdown_content + "\n\n"
-                print(f"Markdown内容:\n{markdown_content}")
-                print("-" * 50)
-        else:
-            print("未找到解析结果中的Markdown内容")
-            exit(1)
-
-        # 调用讯飞API进行简历评价
+        parser = ResumeParser()
         evaluator = XunfeiEvaluator()
-        evaluation = evaluator.evaluate_resume(resume_text)
 
-        # 提取并打印评价结果
-        if "payload" in evaluation and "choices" in evaluation["payload"]:
-            evaluation_text = evaluation["payload"]["choices"][0]["text"][0]["content"]
-            print("\n" + "=" * 50)
-            print("简历评价结果:")
-            print(evaluation_text)
-        else:
-            print("未获取到有效的评价结果")
+        logger.info(f"开始解析简历文件: {file_path}")
+        result, resume_text = parser.parse_resume(file_path)
+        logger.info(f"简历解析完成，共提取{len(resume_text)}字符")
+
+        logger.info("开始评价简历内容...")
+        evaluation = evaluator.evaluate_resume(resume_text)
+        logger.info(f"简历评价完成，得分: {evaluation.get('score')}")
+
+        return {
+            "parse_result": resume_text,
+            "evaluation": evaluation
+        }
 
     except Exception as e:
-        logger.error(f"简历解析出错: {e}")
+        logger.error(f"简历处理流程失败: {e}")
+        raise
+
+
+if __name__ == "__main__":
+    try:
+        resume_path = r"E:\document-git\document-online\工作\个人简历-电子科技大学-韩子健.pdf"
+
+        start_time = time.time()
+        evaluate_result = evaluate_resume_file(resume_path)
+        end_time = time.time()
+
+        print("\n" + "=" * 50)
+        print(f"处理完成，耗时: {end_time - start_time:.2f}秒")
+        print(f"简历得分: {evaluate_result['evaluation']['score']}")
+        print("总结评价:")
+        print(evaluate_result['evaluation']['summary'])
+        # print(evaluate_result['evaluation']['answer'])
+        # print(evaluate_result['parse_result'])
+
+    except Exception as e:
+        logger.error(f"主程序出错: {e}")
