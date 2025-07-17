@@ -6,15 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +93,7 @@
       <recent name="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\interview_manager" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.resumes_engines">
+  <component name="RunManager" selected="Django 服务器.AiInterviewAgent">
     <configuration name="audio_generate_engine" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
@@ -254,8 +247,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-PY-251.25410.159" />
-        <option value="bundled-python-sdk-e0ed3721d81e-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.159" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23339.19" />
+        <option value="bundled-python-sdk-0029f7779945-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23339.19" />
       </set>
     </attachedChunks>
   </component>
@@ -309,6 +302,7 @@
       <workItem from="1752675798006" duration="14706000" />
       <workItem from="1752754108027" duration="169000" />
       <workItem from="1752754328948" duration="194000" />
+      <workItem from="1752781486003" duration="1935000" />
     </task>
     <servers />
   </component>

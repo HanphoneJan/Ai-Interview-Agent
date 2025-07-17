@@ -72,12 +72,14 @@ class UserLoginView(APIView):
             # 正确生成访问令牌和刷新令牌
             access_token = AccessToken.for_user(user)
             refresh_token = RefreshToken.for_user(user)  # 显式生成刷新令牌
-
+            # 获取用户资料信息（复用UserRegistrationSerializer序列化用户信息）
+            profile_serializer = UserRegistrationSerializer(user)
             return Response(
                 {
                     "access": str(access_token),
                     "refresh": str(refresh_token),  # 使用refresh_token
-                    "user_id": user.id
+                    "user_id": user.id,
+                    "profile": profile_serializer.data
                 },
                 status=status.HTTP_200_OK
             )
