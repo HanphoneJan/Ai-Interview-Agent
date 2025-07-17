@@ -6,23 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/2fb7052c-c702-45ed-96ee-6f40c8faefb0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/2fb7052c-c702-45ed-96ee-6f40c8faefb0/storage_v2/_src_/database/ai_interview_agent.sKQXPQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/2fb7052c-c702-45ed-96ee-6f40c8faefb0/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/information_schema.FNRwLQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/2fb7052c-c702-45ed-96ee-6f40c8faefb0/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/pg_catalog.0S1ZNQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/2fb7052c-c702-45ed-96ee-6f40c8faefb0/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/audio_generate_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/audio_generate_engine.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/pipelines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/pipelines.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/resumes_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/resumes_engines.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/synthesized_audio.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/synthesized_audio.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/consumers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" afterDir="false" />
@@ -60,52 +49,52 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Django 服务器.AiInterviewAgent.executor": "Run",
-    "Django 测试.Test: agent_main.executor": "Run",
-    "Django 测试.Test: evaluation_system.tests.EvaluationSystemTestCase.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python 测试.Python 测试 (ai_engines.py 内).executor": "Run",
-    "Python 测试.ai_engines.test_recognition 的 Python 测试.executor": "Run",
-    "Python 测试.test_resumes_engines.TestResumeParser.test_init_client 的 Python 测试.executor": "Run",
-    "Python 测试.test_resumes_engines.test_real_check_status 的 Python 测试.executor": "Run",
-    "Python 测试.test_resumes_engines.test_real_get_result 的 Python 测试.executor": "Run",
-    "Python 测试.test_resumes_engines.test_real_parse_resume 的 Python 测试.executor": "Run",
-    "Python 测试.test_resumes_engines.test_real_upload_file 的 Python 测试.executor": "Run",
-    "Python 测试.test_resumes_engines.test_uploaded_job_id 的 Python 测试.executor": "Run",
-    "Python 测试.tests.test_analyze_live_audio_success 的 Python 测试.executor": "Run",
-    "Python 测试.tests.test_analyze_live_audio_timeout 的 Python 测试.executor": "Run",
-    "Python 测试.tests.test_generate_signa 的 Python 测试.executor": "Run",
-    "Python.ai_engines.executor": "Run",
-    "Python.audio_engines (1).executor": "Run",
-    "Python.audio_generate_engine (1).executor": "Run",
-    "Python.audio_generate_engine.executor": "Run",
-    "Python.audio_generate_engines.executor": "Run",
-    "Python.facial_engines.executor": "Run",
-    "Python.manage.executor": "Run",
-    "Python.resumes_engines.executor": "Run",
-    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.pycharm.django.structure.promotion.once.per.project": "true",
-    "data.grip.promo.notification.shown": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "E:/develop_project/Ai-Interview-Agent/AiInterviewAgent",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Django 服务器.AiInterviewAgent.executor&quot;: &quot;Run&quot;,
+    &quot;Django 测试.Test: agent_main.executor&quot;: &quot;Run&quot;,
+    &quot;Django 测试.Test: evaluation_system.tests.EvaluationSystemTestCase.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python 测试.Python 测试 (ai_engines.py 内).executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.ai_engines.test_recognition 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.test_resumes_engines.TestResumeParser.test_init_client 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.test_resumes_engines.test_real_check_status 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.test_resumes_engines.test_real_get_result 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.test_resumes_engines.test_real_parse_resume 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.test_resumes_engines.test_real_upload_file 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.test_resumes_engines.test_uploaded_job_id 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.tests.test_analyze_live_audio_success 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.tests.test_analyze_live_audio_timeout 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python 测试.tests.test_generate_signa 的 Python 测试.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ai_engines.executor&quot;: &quot;Run&quot;,
+    &quot;Python.audio_engines (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.audio_generate_engine (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.audio_generate_engine.executor&quot;: &quot;Run&quot;,
+    &quot;Python.audio_generate_engines.executor&quot;: &quot;Run&quot;,
+    &quot;Python.facial_engines.executor&quot;: &quot;Run&quot;,
+    &quot;Python.manage.executor&quot;: &quot;Run&quot;,
+    &quot;Python.resumes_engines.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.pycharm.django.structure.promotion.once.per.project&quot;: &quot;true&quot;,
+    &quot;data.grip.promo.notification.shown&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/develop_project/Ai-Interview-Agent/AiInterviewAgent&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\interview_manager" />
@@ -265,8 +254,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23339.19" />
-        <option value="bundled-python-sdk-0029f7779945-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23339.19" />
+        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-PY-251.25410.159" />
+        <option value="bundled-python-sdk-e0ed3721d81e-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.159" />
       </set>
     </attachedChunks>
   </component>
@@ -318,6 +307,8 @@
       <workItem from="1752644481091" duration="8799000" />
       <workItem from="1752669129329" duration="1751000" />
       <workItem from="1752675798006" duration="14706000" />
+      <workItem from="1752754108027" duration="169000" />
+      <workItem from="1752754328948" duration="194000" />
     </task>
     <servers />
   </component>
