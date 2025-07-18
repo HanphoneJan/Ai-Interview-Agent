@@ -2,9 +2,7 @@
 from .models import InterviewSession, InterviewQuestion
 from channels.layers import get_channel_layer
 
-
-
-def get_current_question(session_id):
+async def get_current_question(session_id):
     session = InterviewSession.objects.get(id=session_id)
     question_count = InterviewQuestion.objects.filter(session=session).count()
     if question_count > 0:

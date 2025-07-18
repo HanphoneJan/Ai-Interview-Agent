@@ -206,7 +206,17 @@ LOGGING = {
     },
 }
 
-
+# settings.py
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # 开发环境使用内存通道
+        # 生产环境建议使用 Redis 等消息队列:
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",
+        # "CONFIG": {
+        #     "hosts": [("127.0.0.1", 6379)],
+        # },
+    },
+}
 # 测试
 print("环境变量加载测试:")
 print(f"SECRET_KEY: {SERVER_PORT}")

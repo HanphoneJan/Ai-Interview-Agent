@@ -7,12 +7,20 @@ import tempfile
 import os
 import asyncio
 
+from django.db import models
+from django.utils import timezone
+from asgiref.sync import sync_to_async
+
 from evaluation_system.audio_recognize_engine import recognize
-from evaluation_system.facial_engine import FacialExpressionAnalyzer  # 导入表情分析引擎
+from evaluation_system.facial_engine import FacialExpressionAnalyzer
 from evaluation_system.pipelines import live_evaluation_pipeline
 from interview_manager.services import process_live_stream
 from evaluation_system.evaluate_engine import spark_ai_engine
 from evaluation_system.audio_generate_engine import synthesize
+from interview_manager.utils import send_audio_to_client
+
+from interview_manager.models import InterviewSession, InterviewQuestion
+from evaluation_system.models import ResponseMetadata, ResponseAnalysis, AnswerEvaluation, OverallInterviewEvaluation
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +29,12 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.session_id = None
-        self.buffer = {}  # 存储媒体块的缓冲区
-        self.facial_analyzer = FacialExpressionAnalyzer()  # 初始化表情分析引擎
-        self.last_analyze_time = 0  # 上次分析时间，用于定时控制
-        self.analysis_interval = 1  # 表情分析时间间隔（秒）
-        self.history = []  # 存储对话历史
-        self.current_question = None  # 存储当前问题
+        self.buffer = {}
+        self.facial_analyzer = FacialExpressionAnalyzer()
+        self.last_analyze_time = 0
+        self.analysis_interval = 1
+        self.history = []
+        self.current_question = None
 
     async def connect(self):
         self.session_id = self.scope["url_route"]["kwargs"].get("session_id")
@@ -34,13 +42,18 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
             await self.close(code=4000)
             return
 
-        # 初始化会话缓冲区
+        try:
+            # 使用 sync_to_async 包装同步的数据库操作
+            self.session = await sync_to_async(InterviewSession.objects.get)(id=self.session_id)
+        except InterviewSession.DoesNotExist:
+            await self.close(code=4001)
+            return
+
         self.buffer[self.session_id] = {"audio": [], "video": []}
 
         await self.accept()
         logger.info(f"WebSocket连接已建立，会话ID: {self.session_id}")
 
-        # 生成第一个问题
         await self.generate_and_send_question()
 
     async def receive(self, text_data=None, bytes_data=None):
@@ -52,36 +65,29 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
                 if message_type == "media_chunk":
                     session_id = data["session_id"]
                     media_type = data["media_type"]
-                    chunk_id = data.get("chunk_id")  # 媒体块ID，用于重组
-                    is_last = data.get("is_last", False)  # 是否是最后一个块
+                    chunk_id = data.get("chunk_id")
+                    is_last = data.get("is_last", False)
 
-                    # 处理Base64编码的媒体数据
                     if "chunk" in data:
                         chunk = base64.b64decode(data["chunk"])
                     else:
                         logger.error(f"媒体块缺少数据字段，session_id: {session_id}")
                         return
 
-                    # 存储媒体块到缓冲区
                     self.buffer[session_id][media_type].append(chunk)
 
-                    # 如果是最后一个块或达到一定大小，处理数据
                     if is_last or len(self.buffer[session_id][media_type]) >= 5:
                         combined_data = b"".join(self.buffer[session_id][media_type])
-                        self.buffer[session_id][media_type] = []  # 清空缓冲区
+                        self.buffer[session_id][media_type] = []
 
-                        # 处理不同类型的媒体数据
                         if media_type == "audio":
-                            # 语音数据处理
                             result = await recognize(combined_data)
                             if result["success"]:
                                 speech_text = result["text"]
                                 logger.info(f"语音识别结果: {speech_text[:50]}...")
 
-                                # 存储用户回答到历史记录
                                 self.history.append({"role": "user", "content": speech_text})
 
-                                # 调用实时评估流水线
                                 feedback = await live_evaluation_pipeline(
                                     session_id, combined_data, media_type
                                 )
@@ -90,17 +96,27 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
                                     "speech_text": speech_text
                                 }))
 
-                                # 评估回答并生成新问题
-                                await self.evaluate_and_generate_question(speech_text)
+                                # 使用 sync_to_async 包装同步的数据库操作
+                                current_question = await sync_to_async(InterviewQuestion.objects.filter(session=self.session).latest)('asked_at')
+                                metadata = await sync_to_async(ResponseMetadata.objects.create)(
+                                    question=current_question,
+                                    audio_duration=None  # 这里需要根据实际情况计算音频时长
+                                )
+                                analysis = await sync_to_async(ResponseAnalysis.objects.create)(
+                                    metadata=metadata,
+                                    speech_text=speech_text,
+                                    facial_expression="",  # 这里需要根据实际情况填充表情分析结果
+                                    body_language=""  # 这里需要根据实际情况填充肢体语言分析结果
+                                )
+
+                                await self.evaluate_and_generate_question(speech_text, analysis)
 
                         elif media_type == "video":
-                            # 视频数据处理：定时转图片并分析表情
                             analysis = await self._process_video(combined_data)
 
                             if analysis["success"]:
                                 logger.info(f"视频表情分析结果: 共分析{len(analysis['data'])}帧")
 
-                                # 调用实时评估流水线
                                 feedback = await live_evaluation_pipeline(
                                     session_id, combined_data, media_type
                                 )
@@ -114,18 +130,14 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
                                     "media_type": "video"
                                 }))
 
-                        # 通用媒体流处理
                         await process_live_stream(session_id, combined_data, media_type)
 
                 elif message_type == "control":
                     control_action = data.get("action", "未知操作")
                     logger.info(f"收到控制信令: {control_action}")
-                    # 处理控制信令，如开始/停止录制等
 
             elif bytes_data:
-                # 处理原始二进制数据
                 logger.warning("收到原始二进制数据，建议使用Base64编码通过text_data发送")
-                # 可以添加二进制数据处理逻辑
 
         except json.JSONDecodeError as e:
             logger.error(f"JSON解析失败: {str(e)}")
@@ -134,52 +146,43 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         logger.info(f"WebSocket连接已断开，会话ID: {self.session_id}，关闭代码: {close_code}")
-        # 清理会话缓冲区
         if self.session_id in self.buffer:
             del self.buffer[self.session_id]
 
     async def _process_video(self, video_bytes):
-        """处理视频数据，定时抽取帧并分析表情"""
         try:
-            # 创建临时文件存储视频数据（OpenCV需要文件路径读取）
             with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as f:
                 f.write(video_bytes)
                 temp_video_path = f.name
 
-            # 打开视频文件
             cap = cv2.VideoCapture(temp_video_path)
             if not cap.isOpened():
                 raise Exception("无法解析视频数据，请检查格式是否正确")
 
-            # 获取视频帧率，用于控制抽帧频率
             fps = cap.get(cv2.CAP_PROP_FPS)
             if fps <= 0:
-                fps = 30  # 默认为30fps
-            frame_interval = int(fps * self.analysis_interval)  # 每隔指定秒数抽一帧
+                fps = 30
+            frame_interval = int(fps * self.analysis_interval)
             frame_count = 0
             emotion_results = []
 
-            # 循环读取视频帧
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
-                    break  # 视频读取完毕
+                    break
 
-                # 按时间间隔抽帧
                 if frame_count % frame_interval == 0:
-                    # 处理当前帧：转为JPEG并分析
                     frame_result = await self._analyze_frame(frame)
                     emotion_results.append({
                         "frame_index": frame_count,
-                        "timestamp": frame_count / fps,  # 计算时间戳（秒）
+                        "timestamp": frame_count / fps,
                         "analysis": frame_result
                     })
 
                 frame_count += 1
 
-            # 释放资源
             cap.release()
-            os.unlink(temp_video_path)  # 删除临时视频文件
+            os.unlink(temp_video_path)
 
             return {
                 "success": True,
@@ -189,7 +192,6 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
 
         except Exception as e:
             logger.error(f"视频处理失败: {str(e)}", exc_info=True)
-            # 清理临时文件
             if 'temp_video_path' in locals() and os.path.exists(temp_video_path):
                 os.unlink(temp_video_path)
             return {
@@ -198,18 +200,14 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
             }
 
     async def _analyze_frame(self, frame):
-        """分析单帧图片中的表情"""
-        # 将OpenCV帧转为JPEG格式
         _, img_encoded = cv2.imencode('.jpg', frame)
         if not _:
             return {"success": False, "error": "帧编码失败"}
 
-        # 创建临时图片文件
         with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as f:
             f.write(img_encoded.tobytes())
             temp_img_path = f.name
 
-        # 在线程池中执行同步的表情分析方法（避免阻塞事件循环）
         loop = asyncio.get_event_loop()
         analyze_result = await loop.run_in_executor(
             None,
@@ -217,49 +215,79 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
             temp_img_path
         )
 
-        # 清理临时文件
         os.unlink(temp_img_path)
         return analyze_result
 
     async def generate_and_send_question(self):
-        # 生成问题
+        # 使用 sync_to_async 包装同步的数据库操作
+        question_count = await sync_to_async(InterviewQuestion.objects.filter(session=self.session).count)()
+
         question_query = "请生成一个面试问题"
         response = spark_ai_engine.generate_response(question_query, self.history)
         if response["success"]:
             self.current_question = response["content"]
             self.history.append({"role": "assistant", "content": self.current_question})
 
-            # 发送问题文本
+            # 使用 sync_to_async 包装同步的数据库操作
+            question = await sync_to_async(InterviewQuestion.objects.create)(
+                session=self.session,
+                question_text=self.current_question,
+                question_number=question_count + 1
+            )
+
             await self.send(text_data=json.dumps({
-                "question_text": self.current_question
+                "question": self.current_question
             }))
 
-            # 生成问题语音
             audio_result = await synthesize(self.current_question)
             if audio_result["success"]:
-                audio_data = base64.b64encode(audio_result["audio_data"]).decode()
-                await self.send(text_data=json.dumps({
-                    "question_audio": audio_data
-                }))
-            else:
-                logger.error(f"语音合成失败: {audio_result.get('error', '未知错误')}")
-        else:
-            logger.error(f"生成问题失败: {response['error']}")
+                audio_data = audio_result["audio_data"]
+                await send_audio_to_client(self.session_id, audio_data)
 
-    async def evaluate_and_generate_question(self, user_answer):
-        # 评估回答
-        evaluation_query = f"请评估以下回答：{user_answer}"
+    async def evaluate_and_generate_question(self, speech_text, analysis):
+        evaluation_query = f"请评估这个面试回答：{speech_text}"
         evaluation_response = spark_ai_engine.generate_response(evaluation_query, self.history)
         if evaluation_response["success"]:
             evaluation_text = evaluation_response["content"]
-            self.history.append({"role": "assistant", "content": evaluation_text})
+            score = 0  # 这里需要根据实际情况计算评分
 
-            # 发送评估结果
-            await self.send(text_data=json.dumps({
-                "evaluation_text": evaluation_text
-            }))
+            # 使用 sync_to_async 包装同步的数据库操作
+            current_question = await sync_to_async(InterviewQuestion.objects.filter(session=self.session).latest)('asked_at')
+            await sync_to_async(AnswerEvaluation.objects.create)(
+                question=current_question,
+                analysis=analysis,
+                evaluation_text=evaluation_text,
+                score=score
+            )
 
-            # 生成新问题
-            await self.generate_and_send_question()
+            new_question_query = "请生成一个新的面试问题"
+            new_question_response = spark_ai_engine.generate_response(new_question_query, self.history)
+            if new_question_response["success"]:
+                new_question_text = new_question_response["content"]
+                self.current_question = new_question_text
+                self.history.append({"role": "assistant", "content": new_question_text})
+
+                # 使用 sync_to_async 包装同步的数据库操作
+                question_count = await sync_to_async(InterviewQuestion.objects.filter(session=self.session).count)()
+                await sync_to_async(InterviewQuestion.objects.create)(
+                    session=self.session,
+                    question_text=new_question_text,
+                    question_number=question_count + 1
+                )
+
+                await self.send(text_data=json.dumps({
+                    "question": new_question_text
+                }))
+
+                audio_result = await synthesize(new_question_text)
+                if audio_result["success"]:
+                    audio_data = audio_result["audio_data"]
+                    await send_audio_to_client(self.session_id, audio_data)
+            else:
+                await self.send(text_data=json.dumps({
+                    "error": new_question_response["error"]
+                }))
         else:
-            logger.error(f"评估回答失败: {evaluation_response['error']}")
+            await self.send(text_data=json.dumps({
+                "error": evaluation_response["error"]
+            }))

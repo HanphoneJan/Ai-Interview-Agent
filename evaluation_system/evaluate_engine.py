@@ -31,9 +31,6 @@ class SparkAIEngine:
             logger.error(error_msg)
             raise ValueError(error_msg)
 
-        # 打印配置信息用于调试
-        logger.info(f"星火大模型配置：APP_ID={self.app_id[:3]}***{self.app_id[-3:]}")
-
         # 固定配置（Spark Pro版本）
         self.spark_url = "wss://spark-api.xf-yun.com/v3.1/chat"
         self.domain = "generalv3"  # 与v3.1/chat地址匹配的domain

@@ -1,11 +1,9 @@
-from rest_framework import viewsets, permissions, mixins
-from rest_framework.decorators import action
+# interview_manager/views.py
+from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
-from evaluation_system.audio_generate_engine import synthesize
 from .models import InterviewScenario, InterviewSession, InterviewQuestion
 from .serializers import InterviewScenarioSerializer, InterviewSessionSerializer, InterviewQuestionSerializer
-import random
 
 
 class InterviewScenarioViewSet(viewsets.ModelViewSet):
@@ -24,56 +22,34 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
+        # 确保关联当前用户
         serializer.save(user=self.request.user)
 
-    @action(detail=True, methods=['get'])
-    async def next_question(self, request, pk=None):
+    def create(self, request, *args, **kwargs):
+        # 获取 scenario_id
+        scenario_id = request.data.get('scenario_id')
+
+        # 验证 scenario_id 是否存在
+        if not scenario_id:
+            return Response({"error": "scenario_id 是必需的"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            session = self.get_object()
-        except InterviewSession.DoesNotExist:
-            return Response({"error": "会话不存在"}, status=404)
+            scenario = InterviewScenario.objects.get(id=scenario_id)
+        except InterviewScenario.DoesNotExist:
+            return Response({"error": f"找不到 ID 为 {scenario_id} 的面试场景"}, status=status.HTTP_404_NOT_FOUND)
 
-        if session.user != request.user and not request.user.is_staff:
-            return Response({"error": "无权限访问此会话"}, status=403)
+        # 创建会话
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
 
-        question_count = InterviewQuestion.objects.filter(session=session).count()
-
-        if question_count < 5:
-            question_bank = [
-                "请介绍你最熟悉的项目",
-                "如何解决代码中的性能瓶颈",
-                "描述一次团队协作中遇到的挑战",
-                "说说你对这个技术领域的理解",
-                "如果你负责这个项目，会采取什么策略"
-            ]
-
-            asked_questions = InterviewQuestion.objects.filter(session=session).values_list('question_text', flat=True)
-            available_questions = [q for q in question_bank if q not in asked_questions]
-
-            next_question_text = random.choice(available_questions) if available_questions else "请分享你的职业规划"
-
-            next_question = InterviewQuestion.objects.create(
-                session=session,
-                question_text=next_question_text,
-                question_number=question_count + 1
-            )
-
-            # 调用语音合成模块
-            audio_result = await synthesize(next_question_text)
-            if audio_result["success"]:
-                audio_data = audio_result["audio_data"]
-                # 这里可以将音频数据传递给 client_media_manager，例如通过 WebSocket 发送
-                # 假设我们有一个 send_audio_to_client 函数来处理这个逻辑
-                # send_audio_to_client(session.id, audio_data)
-
-            serializer = InterviewQuestionSerializer(next_question)
-            return Response(serializer.data)
-        else:
-            session.is_finished = True
-            session.end_time = None
-            session.save()
-            return Response({"message": "面试已结束"}, status=200)
-
+        # 返回包含 session_id 的响应
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            {"session_id": serializer.instance.id},
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
 class InterviewQuestionViewSet(viewsets.ReadOnlyModelViewSet):
     """面试问题管理API（只读，问题由会话自动生成）"""
     queryset = InterviewQuestion.objects.all()
