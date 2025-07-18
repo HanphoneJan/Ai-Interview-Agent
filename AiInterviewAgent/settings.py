@@ -220,6 +220,9 @@ CHANNEL_LAYERS = {
 
 FFMPEG_PATH = r"D:\ffmpeg-7.0.2-essentials_build\bin\ffmpeg.exe"
 os.environ["PATH"] += os.pathsep + os.path.dirname(FFMPEG_PATH)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 项目根目录下的 media 文件夹
+MEDIA_URL = '/media/'
+print(os.name)
 
 # 测试
 print("环境变量加载成功")

@@ -6,7 +6,7 @@ It exposes the ASGI callable as a module-level variable named ``application``.
 For more information on this file, see
 https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
 """
-
+import asyncio
 # asgi.py
 import os
 from django.core.asgi import get_asgi_application
@@ -14,8 +14,9 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from interview_manager import routing as client_media_routing
 
+if os.name == 'nt':
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "AiInterviewAgent.settings")
-
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(

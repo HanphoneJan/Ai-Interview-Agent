@@ -1,52 +1,43 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
+
 from interview_manager.models import InterviewQuestion, InterviewSession
 from user_manager.models import User
 
 class ResponseMetadata(models.Model):
-    """存储回答的时长"""
+    """存储回答的时长等元数据（仅文本/数值信息）"""
     question = models.ForeignKey(
         InterviewQuestion,
         on_delete=models.CASCADE,
         related_name='response_metadata'
-    ) #外键绑定
-    audio_duration = models.DurationField(null=True, blank=True)  # 音频时长
-    video_duration = models.DurationField(null=True, blank=True)  # 视频时长
-    upload_timestamp = models.DateTimeField(auto_now_add=True)
+    )  # 关联当前问题
+    audio_duration = models.DurationField(null=True, blank=True)  # 音频时长（数值型）
+    video_duration = models.DurationField(null=True, blank=True)  # 视频时长（数值型）
+    upload_timestamp = models.DateTimeField(auto_now_add=True)  # 上传时间戳
 
     def __str__(self):
         return f"Response Meta for Q{self.question.question_number}"
 
 
-class LiveStreamChunk(models.Model):
-    """实时媒体流数据块，不存入数据库"""
-    session_id = models.CharField(max_length=255)
-    media_type = models.CharField(max_length=10, choices=[('audio', 'Audio'), ('video', 'Video')])
-    chunk_data = models.BinaryField()
-    received_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Chunk for session {self.session_id} - {self.media_type}"
-
-
 class ResponseAnalysis(models.Model):
-    """存储多模态分析结果（语音文本、表情特征等）"""
+    """存储多模态分析结果（仅文本化结果）"""
     metadata = models.OneToOneField(
         ResponseMetadata,
         on_delete=models.CASCADE,
         related_name='analysis'
     )
-    speech_text = models.TextField()  # 语音转文字结果
-    facial_expression = models.TextField()  # 表情分析结果
-    body_language = models.TextField()  # 肢体语言分析结果
-    analysis_timestamp = models.DateTimeField(auto_now_add=True)
+    speech_text = models.TextField()  # 语音转文字结果（文本）
+    facial_expression = models.TextField(blank=True)  # 表情分析结果（文本化，如JSON字符串）
+    body_language = models.TextField(blank=True)  # 肢体语言分析结果（文本化）
+    analysis_timestamp = models.DateTimeField(auto_now_add=True)  # 分析时间
 
     def __str__(self):
         return f"Analysis for Q{self.metadata.question.question_number}"
 
 
 class AnswerEvaluation(models.Model):
-    """单问题及其回答评估，可存储在数据库"""
+    """单问题回答的评估结果（仅文本/数值）"""
     question = models.ForeignKey(
         InterviewQuestion,
         on_delete=models.CASCADE,
@@ -57,23 +48,23 @@ class AnswerEvaluation(models.Model):
         on_delete=models.CASCADE,
         related_name='evaluations'
     )
-    evaluation_text = models.TextField()  # 评估文本
-    score = models.FloatField(default=0)  # 单项评分
-    evaluated_at = models.DateTimeField(auto_now_add=True)
+    evaluation_text = models.TextField()  # 评估文本内容
+    score = models.FloatField(default=0)  # 单项评分（数值）
+    evaluated_at = models.DateTimeField(auto_now_add=True)  # 评估时间
 
     def __str__(self):
         return f"Evaluation for Q{self.question.question_number}"
 
 
 class ResumeEvaluation(models.Model):
-    """简历评估信息"""
-    session = models.OneToOneField(
+    """简历评估信息（仅文本/数值）"""
+    user = models.OneToOneField(  # 修正：关联User而非InterviewSession
         User,
         on_delete=models.CASCADE,
         related_name='resume_evaluation'
     )
-    resume_score = models.PositiveIntegerField(default=0)  # 简历评分
-    resume_summary = models.TextField(blank=True, null=True)  # 简历总结性评价分析
+    resume_score = models.PositiveIntegerField(default=0)  # 简历评分（数值）
+    resume_summary = models.TextField(blank=True, null=True)  # 简历总结（文本）
 
     def clean(self):
         if self.resume_score < 1 or self.resume_score > 10:
@@ -85,7 +76,7 @@ class ResumeEvaluation(models.Model):
 
 
 class OverallInterviewEvaluation(models.Model):
-    """面试整体评估，存储在数据库"""
+    """面试整体评估（仅文本/数值）"""
     session = models.OneToOneField(
         InterviewSession,
         on_delete=models.CASCADE,
@@ -98,7 +89,7 @@ class OverallInterviewEvaluation(models.Model):
     )
     overall_evaluation = models.TextField()  # 整体评估文本
 
-    # 8项能力评分（1-10分）
+    # 8项能力评分（1-10分，数值型）
     professional_knowledge = models.PositiveIntegerField(default=0)
     skill_match = models.PositiveIntegerField(default=0)
     language_expression = models.PositiveIntegerField(default=0)
@@ -114,7 +105,7 @@ class OverallInterviewEvaluation(models.Model):
         return f"Overall Evaluation for Session {self.session.id}"
 
     def clean(self):
-        # 确保各项能力评分在1-10分之间（包含新增字段）
+        # 确保各项能力评分在1-10分之间
         score_fields = [
             'professional_knowledge', 'skill_match', 'language_expression',
             'logical_thinking', 'stress_response', 'personality',

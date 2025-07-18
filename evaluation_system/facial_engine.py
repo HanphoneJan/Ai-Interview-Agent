@@ -4,6 +4,8 @@
 """
 import json
 
+import cv2
+import numpy as np
 import requests
 import time
 import hashlib
@@ -152,7 +154,74 @@ class FacialExpressionAnalyzer:
                 "error": f"分析失败: {str(e)}"
             }
 
+    def analyze_frame(self, frame: np.ndarray) -> Dict[str, Union[str, dict]]:
+        """
+        分析视频帧中的人脸表情
+        :param frame: OpenCV读取的视频帧(numpy.ndarray)
+        :return: 分析结果字典
+        """
+        try:
+            # 将OpenCV帧(BRG格式)转换为JPEG字节流
+            _, buffer = cv2.imencode('.jpg', frame)
+            image_bytes = buffer.tobytes()
 
+            # 生成随机文件名
+            image_name = f"frame_{int(time.time() * 1000)}.jpg"
+
+            # 生成请求头
+            headers = self._generate_headers(image_name)
+
+            # 发送请求
+            response = requests.post(self.URL, headers=headers, data=image_bytes)
+            response.raise_for_status()
+
+            result = response.json()
+            logger.debug(f"表情分析API响应: {result}")
+
+            # 解析响应中的表情数据
+            emotions = self._parse_expression_result(result)
+            return {
+                "success": True,
+                "data": emotions,
+                "message": "表情分析成功"
+            }
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"API请求失败: {e}")
+            return {
+                "success": False,
+                "error": f"API请求失败: {str(e)}",
+                "status_code": getattr(e.response, 'status_code', None)
+            }
+        except Exception as e:
+            logger.error(f"表情分析失败: {e}")
+            return {
+                "success": False,
+                "error": f"表情分析失败: {str(e)}"
+            }
+
+    def _parse_expression_result(self, result: Dict) -> Dict:
+        """
+        解析API返回的表情结果
+        :param result: API原始响应
+        :return: 解析后的表情数据
+        """
+        # 根据讯飞API实际返回格式进行解析
+        # 以下为示例实现，需根据实际API文档调整
+        if result.get("code") != 0:
+            logger.warning(f"API返回非成功状态: {result.get('desc')}")
+            return {}
+
+        emotions = {}
+        if "data" in result and "face" in result["data"]:
+            for face_idx, face in enumerate(result["data"]["face"]):
+                emotions[f"face_{face_idx}"] = {
+                    "expression": face.get("expression", "unknown"),
+                    "confidence": face.get("confidence", 0.0),
+                    "location": face.get("location", {})
+                }
+
+        return emotions
 # 示例用法
 if __name__ == "__main__":
     # 配置日志
