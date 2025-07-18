@@ -12,7 +12,7 @@ class InterviewScenario(models.Model):
     name = models.CharField(max_length=200)
     technology_field = models.CharField(max_length=200)
     description = models.TextField()
-    is_real_time = models.BooleanField(default=False)  # 是否为实时面试
+    is_real_time = models.BooleanField(default=True)  # 是否为实时面试
     media_config = JSONField(
         default=dict,
         help_text="媒体配置（分辨率、码率等）"

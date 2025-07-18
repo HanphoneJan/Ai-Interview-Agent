@@ -42,7 +42,7 @@ class OverallInterviewEvaluationSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # 确保各项能力评分在1-10分之间
-        for field in ['professional_knowledge', 'skill_match', 'language_expression', 'logical_thinking', 'innovation', 'stress_response']:
+        for field in ['professional_knowledge', 'skill_match', 'language_expression', 'logical_thinking', 'motivation', 'stress_response','value','personality']:
             value = data.get(field)
             if value is not None and (value < 1 or value > 10):
                 raise serializers.ValidationError({field: '评分必须在1-10分之间'})

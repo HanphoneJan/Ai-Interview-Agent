@@ -4,12 +4,12 @@ from interview_manager.models import InterviewQuestion, InterviewSession
 from user_manager.models import User
 
 class ResponseMetadata(models.Model):
-    """存储回答的元数据（不存储实际音视频文件）"""
+    """存储回答的时长"""
     question = models.ForeignKey(
         InterviewQuestion,
         on_delete=models.CASCADE,
         related_name='response_metadata'
-    )
+    ) #外键绑定
     audio_duration = models.DurationField(null=True, blank=True)  # 音频时长
     video_duration = models.DurationField(null=True, blank=True)  # 视频时长
     upload_timestamp = models.DateTimeField(auto_now_add=True)
@@ -19,7 +19,7 @@ class ResponseMetadata(models.Model):
 
 
 class LiveStreamChunk(models.Model):
-    """存储实时媒体流数据块"""
+    """实时媒体流数据块，不存入数据库"""
     session_id = models.CharField(max_length=255)
     media_type = models.CharField(max_length=10, choices=[('audio', 'Audio'), ('video', 'Video')])
     chunk_data = models.BinaryField()
@@ -46,7 +46,7 @@ class ResponseAnalysis(models.Model):
 
 
 class AnswerEvaluation(models.Model):
-    """单问题回答评估"""
+    """单问题及其回答评估，可存储在数据库"""
     question = models.ForeignKey(
         InterviewQuestion,
         on_delete=models.CASCADE,
@@ -85,7 +85,7 @@ class ResumeEvaluation(models.Model):
 
 
 class OverallInterviewEvaluation(models.Model):
-    """面试整体评估"""
+    """面试整体评估，存储在数据库"""
     session = models.OneToOneField(
         InterviewSession,
         on_delete=models.CASCADE,
@@ -98,13 +98,12 @@ class OverallInterviewEvaluation(models.Model):
     )
     overall_evaluation = models.TextField()  # 整体评估文本
 
-    # 各项能力评分（1-10分）
+    # 8项能力评分（1-10分）
     professional_knowledge = models.PositiveIntegerField(default=0)
     skill_match = models.PositiveIntegerField(default=0)
     language_expression = models.PositiveIntegerField(default=0)
     logical_thinking = models.PositiveIntegerField(default=0)
     stress_response = models.PositiveIntegerField(default=0)
-    # 新增评分项
     personality = models.PositiveIntegerField(default=0)  # 性格特质评分
     motivation = models.PositiveIntegerField(default=0)  # 求职动机评分
     value = models.PositiveIntegerField(default=0)  # 价值观匹配度评分
