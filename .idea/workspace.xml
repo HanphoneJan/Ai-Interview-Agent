@@ -5,24 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/7687c07f-8c5c-49dd-a5cb-2c9c9759bba3/storage_v2/_src_/database/ai_interview_agent.sKQXPQ/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/asgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/asgi.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AiInterviewAgent/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/AiInterviewAgent/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/audio_generate_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/audio_generate_engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/facial_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/facial_engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0002_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/migrations/0003_initial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/evaluation_system/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/consumers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/migrations/0002_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/migrations/0003_alter_interviewscenario_is_real_time.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/resumes_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/resumes_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -201,7 +193,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="resumes_engines" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="resumes_engine" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AiInterviewAgent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -215,7 +207,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/evaluation_system/resumes_engines.py" />
+      <option name="SCRIPT_NAME" value="E:\develop_project\Ai-Interview-Agent\AiInterviewAgent\evaluation_system\resumes_engine.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -318,7 +310,7 @@
       <workItem from="1752754108027" duration="169000" />
       <workItem from="1752754328948" duration="194000" />
       <workItem from="1752781486003" duration="1935000" />
-      <workItem from="1752809796255" duration="32813000" />
+      <workItem from="1752809796255" duration="40134000" />
     </task>
     <servers />
   </component>

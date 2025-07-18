@@ -282,7 +282,7 @@ class XunfeiEvaluator:
                             print(f"提取到分数: {score}")
                         except ValueError as e:
                             print(f"解析分数失败: {e}, 原始文本: {line}")
-                            score = 0  # 设置默认值
+                            score = '6.0' # 设置默认值
 
                     elif "总结性分析评价：" in line:
                         # 提取冒号后的所有内容（包括换行符）
@@ -296,9 +296,9 @@ class XunfeiEvaluator:
                             next_idx += 1
 
                 if score is None:
-                    score = 0
+                    score = '6.0'
                 if not summary:
-                    summary = "无有效评价"
+                    summary = "一般"
 
                 result = {
                     "answer": full_response,

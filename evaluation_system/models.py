@@ -1,6 +1,4 @@
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import timezone
 
 from interview_manager.models import InterviewQuestion, InterviewSession
 from user_manager.models import User
@@ -63,12 +61,9 @@ class ResumeEvaluation(models.Model):
         on_delete=models.CASCADE,
         related_name='resume_evaluation'
     )
-    resume_score = models.PositiveIntegerField(default=0)  # 简历评分（数值）
+    resume_score = models.CharField(max_length=100, default='0') # 简历评分（数值）
     resume_summary = models.TextField(blank=True, null=True)  # 简历总结（文本）
 
-    def clean(self):
-        if self.resume_score < 1 or self.resume_score > 10:
-            raise ValidationError({'resume_score': '评分必须在1-10分之间'})
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -89,32 +84,20 @@ class OverallInterviewEvaluation(models.Model):
     )
     overall_evaluation = models.TextField()  # 整体评估文本
 
-    # 8项能力评分（1-10分，数值型）
-    professional_knowledge = models.PositiveIntegerField(default=0)
-    skill_match = models.PositiveIntegerField(default=0)
-    language_expression = models.PositiveIntegerField(default=0)
-    logical_thinking = models.PositiveIntegerField(default=0)
-    stress_response = models.PositiveIntegerField(default=0)
-    personality = models.PositiveIntegerField(default=0)  # 性格特质评分
-    motivation = models.PositiveIntegerField(default=0)  # 求职动机评分
-    value = models.PositiveIntegerField(default=0)  # 价值观匹配度评分
+    # 修改为字符串类型（最大长度100，可根据实际需求调整）
+    professional_knowledge = models.CharField(max_length=100, default='0')
+    skill_match = models.CharField(max_length=100, default='0')
+    language_expression = models.CharField(max_length=100, default='0')
+    logical_thinking = models.CharField(max_length=100, default='0')
+    stress_response = models.CharField(max_length=100, default='0')
+    personality = models.CharField(max_length=100, default='0')  # 性格特质评分
+    motivation = models.CharField(max_length=100, default='0')  # 求职动机评分
+    value = models.CharField(max_length=100, default='0')  # 价值观匹配度评分
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Overall Evaluation for Session {self.session.id}"
-
-    def clean(self):
-        # 确保各项能力评分在1-10分之间
-        score_fields = [
-            'professional_knowledge', 'skill_match', 'language_expression',
-            'logical_thinking', 'stress_response', 'personality',
-            'motivation', 'value'
-        ]
-        for field in score_fields:
-            value = getattr(self, field)
-            if value < 1 or value > 10:
-                raise ValidationError({field: '评分必须在1-10分之间'})
 
     def save(self, *args, **kwargs):
         self.full_clean()

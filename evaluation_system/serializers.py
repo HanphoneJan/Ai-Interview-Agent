@@ -1,8 +1,23 @@
 # evaluation_system/serializers.py
 from rest_framework import serializers
-from .models import ResponseMetadata,ResponseAnalysis, AnswerEvaluation, OverallInterviewEvaluation
+from .models import (
+    ResponseMetadata,
+    ResponseAnalysis,
+    AnswerEvaluation,
+    ResumeEvaluation,
+    OverallInterviewEvaluation
+)
 from interview_manager.models import InterviewQuestion, InterviewSession
 from user_manager.models import User
+
+class ResponseMetadataSerializer(serializers.ModelSerializer):
+    question = serializers.PrimaryKeyRelatedField(
+        queryset=InterviewQuestion.objects.all()
+    )
+
+    class Meta:
+        model = ResponseMetadata
+        fields = '__all__'
 
 class ResponseAnalysisSerializer(serializers.ModelSerializer):
     metadata = serializers.PrimaryKeyRelatedField(
@@ -20,13 +35,24 @@ class AnswerEvaluationSerializer(serializers.ModelSerializer):
     analysis = serializers.PrimaryKeyRelatedField(
         queryset=ResponseAnalysis.objects.all()
     )
+
+    class Meta:
+        model = AnswerEvaluation
+        fields = '__all__'
+
+class ResumeEvaluationSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all()
     )
 
     class Meta:
-        model = AnswerEvaluation
+        model = ResumeEvaluation
         fields = '__all__'
+
+    def validate_resume_score(self, value):
+        if float(value) < 0 or float(value) > 10:
+            raise serializers.ValidationError('评分必须在0-10分之间')
+        return value
 
 class OverallInterviewEvaluationSerializer(serializers.ModelSerializer):
     session = serializers.PrimaryKeyRelatedField(
@@ -42,8 +68,13 @@ class OverallInterviewEvaluationSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # 确保各项能力评分在1-10分之间
-        for field in ['professional_knowledge', 'skill_match', 'language_expression', 'logical_thinking', 'motivation', 'stress_response','value','personality']:
+        score_fields = [
+            'professional_knowledge', 'skill_match', 'language_expression',
+            'logical_thinking', 'stress_response', 'personality',
+            'motivation', 'value'
+        ]
+        for field in score_fields:
             value = data.get(field)
-            if value is not None and (value < 1 or value > 10):
-                raise serializers.ValidationError({field: '评分必须在1-10分之间'})
+            if value is not None and (float(value) < 1 or float(value)> 10):
+                raise serializers.ValidationError({field: '评分必须在0-10分之间'})
         return data
