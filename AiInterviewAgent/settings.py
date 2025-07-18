@@ -217,6 +217,9 @@ CHANNEL_LAYERS = {
         # },
     },
 }
+
+FFMPEG_PATH = r"D:\ffmpeg-7.0.2-essentials_build\bin\ffmpeg.exe"
+os.environ["PATH"] += os.pathsep + os.path.dirname(FFMPEG_PATH)
+
 # 测试
-print("环境变量加载测试:")
-print(f"SECRET_KEY: {SERVER_PORT}")
+print("环境变量加载成功")
