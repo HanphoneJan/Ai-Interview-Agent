@@ -153,11 +153,6 @@ async def process_live_media(session_id, base64_data, timestamp, user_id, media_
             logger.error(f"解码后数据过小: {data_size} bytes")
             return {"success": False, "error": "数据不完整或过小"}
 
-        # 验证WebM文件头
-        if not webm_bytes.startswith(b'\x1A\x45\xDF\xA3'):
-            logger.error(f"无效的WebM文件头: {webm_bytes[:4].hex()}")
-            return {"success": False, "error": "WebM文件头无效"}
-
         # 保存到文件系统
         file_path = await sync_to_async(_save_media_to_filesystem)(
             session_id, webm_bytes, timestamp, media_type
@@ -644,13 +639,64 @@ async def _convert_to_mp4(input_path, output_path):
         raise
 
 
+async def process_image_data(session_id, base64_data, timestamp):
+    """处理图片数据，进行表情分析"""
+    try:
+        logger.info(f"开始处理图片数据，session_id: {session_id}")
+
+        # 解码base64数据
+        image_bytes = safe_base64_decode(base64_data)
+        if image_bytes is None:
+            return {"success": False, "error": "Base64解码失败"}
+
+        # 保存图片到临时文件
+        temp_path = os.path.join(VIDEO_TEMP_DIR, f"image_{timestamp}_{os.urandom(8).hex()}.jpg")
+        with open(temp_path, 'wb') as f:
+            f.write(image_bytes)
+
+        # 分析图片
+        analyzer = FacialExpressionAnalyzer()
+        frame = cv2.imread(temp_path)
+        if frame is None:
+            logger.error("无法读取图片文件")
+            return {"success": False, "error": "无法读取图片文件"}
+
+        analysis_result = await asyncio.to_thread(analyzer.analyze_frame, frame)
+
+        # 清理临时文件
+        try:
+            os.unlink(temp_path)
+        except Exception as e:
+            logger.warning(f"删除临时图片文件失败: {str(e)}")
+
+        if not analysis_result.get("success"):
+            return {"success": False, "error": analysis_result.get("error", "表情分析失败")}
+
+        # 保存分析结果
+        session = await sync_to_async(InterviewSession.objects.get)(id=session_id)
+        latest_analysis = await sync_to_async(
+            ResponseAnalysis.objects.filter(metadata__question__session=session)
+            .order_by('-analysis_timestamp').first
+        )()
+
+        if latest_analysis:
+            latest_analysis.facial_expression = str(analysis_result.get("data", {}))
+            await sync_to_async(latest_analysis.save)()
+
+        return {"success": True, "data": analysis_result.get("data", {})}
+
+    except Exception as e:
+        logger.error(f"处理图片数据失败: {str(e)}", exc_info=True)
+        return {"success": False, "error": str(e)}
+
+
 async def generate_initial_question(session):
     """生成初始面试问题"""
     try:
         logger.info(f"为会话 {session.id} 生成初始问题")
 
         new_question_response = spark_ai_engine.generate_response(
-            "生成初始面试问题", []
+            "假设你现在是一个面试官，正在对一个求职的大学生进行面试，请提出第一个面试问题。要求该问题比较简短。", []
         )
         if new_question_response["success"]:
             new_question_text = new_question_response["content"]

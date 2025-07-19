@@ -36,7 +36,7 @@ class AudioGenerateParam:
         # 公共参数(common)
         self.CommonArgs = {"app_id": self.APPID}
         # 业务参数(business)，更多个性化参数可在官网查看  mp3格式
-        self.BusinessArgs = {"aue": "lame", "auf": "audio/L16;rate=16000", "vcn": "x4_yezi", "tte": "utf8","sfl":1,"speed":40}
+        self.BusinessArgs = {"aue": "lame", "auf": "audio/L16;rate=16000", "vcn": "x4_yezi", "tte": "utf8","sfl":1,"speed":50}
         self.Data = {"status": 2, "text": str(base64.b64encode(self.Text.encode('utf-8')), "UTF8")}
 
     def create_url(self):

@@ -5,7 +5,7 @@ import json
 import logging
 from asgiref.sync import sync_to_async
 from .models import InterviewSession
-from .services import process_live_media, generate_initial_question
+from .services import process_live_media, generate_initial_question, process_image_data
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +73,21 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
                         "success": result["success"],
                         "message": result.get("message", ""),
                         "timestamp": data.get("timestamp")
+                    }))
+
+                elif message_type.lower() == "image":
+                    # 处理图片数据
+                    result = await process_image_data(
+                        self.session_id,
+                        data.get("data"),
+                        data.get("timestamp")
+                    )
+                    await self.send(text_data=json.dumps({
+                        "type": "image_ack",
+                        "success": result["success"],
+                        "message": result.get("message", ""),
+                        "timestamp": data.get("timestamp"),
+                        "analysis": result.get("data", {})
                     }))
 
                 elif message_type == "control":
