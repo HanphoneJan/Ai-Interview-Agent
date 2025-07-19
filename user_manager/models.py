@@ -1,9 +1,9 @@
-# user_manager/models.py
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 import datetime
 from django.utils import timezone
+
 
 class User(AbstractUser):
     # 基本信息
@@ -22,6 +22,38 @@ class User(AbstractUser):
     )
     major = models.CharField(max_length=100, blank=True, null=False, default='')  # 空字符串作为默认值
     university = models.CharField(max_length=100, blank=True, null=False, default='汉')  # 空字符串作为默认值
+
+    # 新增年龄字段
+    age = models.IntegerField(
+        blank=True,
+        null=True,
+        validators=[
+            MinValueValidator(1, message="年龄不能小于1"),
+            MaxValueValidator(120, message="年龄不能大于120")
+        ]
+    )
+
+    # 新增学习阶段字段
+    LEARNING_STAGE_CHOICES = [
+        ('FRESHMAN_1', '大一上'),
+        ('FRESHMAN_2', '大一下'),
+        ('SOPHOMORE_1', '大二上'),
+        ('SOPHOMORE_2', '大二下'),
+        ('JUNIOR_1', '大三上'),
+        ('JUNIOR_2', '大三下'),
+        ('SENIOR_1', '大四上'),
+        ('SENIOR_2', '大四下'),
+        ('GRADUATE_STUDENT', '研究生'),
+        ('JOB_SEEKER', '应届生'),
+        ('EMPLOYED', '社会人士'),
+        ('OTHER', '其他'),
+    ]
+    learning_stage = models.CharField(
+        max_length=20,
+        choices=LEARNING_STAGE_CHOICES,
+        blank=True,
+        null=True
+    )
 
     # 个人信息
     name = models.CharField(max_length=40, blank=True, null=False, default='')  # 空字符串作为默认值
@@ -49,6 +81,7 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
+
 class EmailVerificationCode(models.Model):
     email = models.EmailField(unique=True)
     code = models.CharField(max_length=6)  # 6位数字验证码
@@ -63,4 +96,4 @@ class EmailVerificationCode(models.Model):
         # 设置默认过期时间（5分钟后）
         if not self.expires_at:
             self.expires_at = datetime.datetime.now() + datetime.timedelta(minutes=5)
-        super().save(*args, **kwargs)
+        super().save(*args, **kwargs)    

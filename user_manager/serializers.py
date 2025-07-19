@@ -1,16 +1,10 @@
 import re
-
-from django.contrib.auth import authenticate
-from rest_framework import serializers
-from .models import User, EmailVerificationCode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from .models import User  # 假设User模型在models.py中
-
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
@@ -21,13 +15,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = [
             'email', 'username', 'password', 'confirm_password',
             'major', 'university', 'phone', 'gender', 'name',
-            'province', 'city', 'district', 'address', 'ethnicity'
+            'province', 'city', 'district', 'address', 'ethnicity',
+            # 新增字段
+            'age', 'learning_stage'
         ]
         extra_kwargs = {
             'email': {'required': True},
             'username': {'required': True},
             'name': {'required': True},
             'phone': {'required': True},
+            # 年龄和学习阶段设为非必填，根据实际需求调整
+            'age': {'required': False},
+            'learning_stage': {'required': False},
         }
 
     def validate(self, data):
@@ -48,6 +47,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         if not re.match(phone_regex, data['phone']):
             raise serializers.ValidationError("手机号格式错误")
 
+        # 验证年龄范围（如果提供了年龄）
+        if 'age' in data and data['age'] is not None:
+            if data['age'] < 1 or data['age'] > 120:
+                raise serializers.ValidationError("年龄必须在1-120之间")
+
+        # 验证学习阶段（如果提供了学习阶段）
+        if 'learning_stage' in data and data['learning_stage'] is not None:
+            valid_stages = dict(User.LEARNING_STAGE_CHOICES).keys()
+            if data['learning_stage'] not in valid_stages:
+                raise serializers.ValidationError("无效的学习阶段")
+
         return data
 
     def create(self, validated_data):
@@ -60,8 +70,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
         # 创建用户并设置哈希后的密码
         user = User.objects.create(
-            password=hashed_password,
-            **validated_data
+            password=hashed_password,** validated_data
         )
 
         # 生成邮箱验证令牌
@@ -71,11 +80,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # 这里可以添加发送验证邮件的逻辑
 
         return user
-
-
-from django.contrib.auth import authenticate
-from rest_framework import serializers
-from .models import User
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -121,6 +125,7 @@ class UserLoginSerializer(serializers.Serializer):
 
         return {'user': user}
 
+
 class EmailVerificationSerializer(serializers.Serializer):
     uid = serializers.CharField()
     token = serializers.CharField()
@@ -141,14 +146,15 @@ class EmailVerificationSerializer(serializers.Serializer):
         return {'user': user}
 
 
-
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
             'email', 'username', 'major', 'university', 'phone',
             'gender', 'name', 'province', 'city', 'district',
-            'address', 'ethnicity', 'is_email_verified'
+            'address', 'ethnicity', 'is_email_verified',
+            # 新增字段
+            'age', 'learning_stage'
         ]
         read_only_fields = ['email', 'is_email_verified']
 
@@ -163,6 +169,20 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if User.objects.exclude(pk=user.pk).filter(phone=value).exists():
             raise serializers.ValidationError("该手机号已被其他用户使用")
 
+        return value
+
+    def validate_age(self, value):
+        # 验证年龄范围
+        if value is not None and (value < 1 or value > 120):
+            raise serializers.ValidationError("年龄必须在1-120之间")
+        return value
+
+    def validate_learning_stage(self, value):
+        # 验证学习阶段有效性
+        if value is not None:
+            valid_stages = dict(User.LEARNING_STAGE_CHOICES).keys()
+            if value not in valid_stages:
+                raise serializers.ValidationError("无效的学习阶段")
         return value
 
     def update(self, instance, validated_data):

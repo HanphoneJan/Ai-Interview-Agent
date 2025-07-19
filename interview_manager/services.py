@@ -6,6 +6,7 @@ import subprocess
 import sys  # 新增：用于判断操作系统
 from django.conf import settings
 import asyncio
+import webrtcvad
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from asgiref.sync import sync_to_async

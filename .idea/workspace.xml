@@ -6,6 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/serializers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -301,7 +305,7 @@
       <workItem from="1752754328948" duration="194000" />
       <workItem from="1752781486003" duration="1935000" />
       <workItem from="1752809796255" duration="40134000" />
-      <workItem from="1752909592656" duration="14127000" />
+      <workItem from="1752909592656" duration="17522000" />
     </task>
     <servers />
   </component>
@@ -318,17 +322,6 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/interview_manager/services.py</url>
-          <line>221</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/AiInterviewAgent$audio_generate_engine.coverage" NAME="audio_generate_engine 覆盖结果" MODIFIED="1752687982345" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/evaluation_system" />
