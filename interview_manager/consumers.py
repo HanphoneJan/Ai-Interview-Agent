@@ -5,7 +5,7 @@ import json
 import logging
 from asgiref.sync import sync_to_async
 from .models import InterviewSession
-from .services import process_live_media, generate_initial_question, process_image_data
+from .services import process_live_media, generate_initial_question, process_image_data, process_text_answer
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +56,7 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
                         "type": "audio_ack",
                         "success": result["success"],
                         "message": result.get("message", ""),
+                        "answer": result.get("answer", ""),  # 添加识别结果
                         "timestamp": data.get("timestamp")
                     }))
 
@@ -88,6 +89,26 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
                         "message": result.get("message", ""),
                         "timestamp": data.get("timestamp"),
                         "analysis": result.get("data", {})
+                    }))
+
+                elif message_type.lower() == "text":
+                    # 处理文本回答
+                    answer_text = data.get("data", "")
+                    timestamp = data.get("timestamp", "")
+                    logger.info(f"收到文本回答: {answer_text[:50]}...")
+
+                    # 处理文本回答并生成新问题
+                    result = await process_text_answer(
+                        self.session_id,
+                        answer_text,
+                        timestamp
+                    )
+
+                    await self.send(text_data=json.dumps({
+                        "type": "text_ack",
+                        "success": result["success"],
+                        "message": result.get("message", ""),
+                        "timestamp": timestamp
                     }))
 
                 elif message_type == "control":
