@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -302,7 +301,7 @@
       <workItem from="1752754328948" duration="194000" />
       <workItem from="1752781486003" duration="1935000" />
       <workItem from="1752809796255" duration="40134000" />
-      <workItem from="1752909592656" duration="12332000" />
+      <workItem from="1752909592656" duration="14127000" />
     </task>
     <servers />
   </component>
@@ -325,7 +324,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/interview_manager/services.py</url>
-          <line>91</line>
+          <line>221</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
