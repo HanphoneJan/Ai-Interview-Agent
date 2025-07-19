@@ -36,6 +36,80 @@ class LiveStreamConsumer(AsyncWebsocketConsumer):
         # 生成初始问题
         await generate_initial_question(self.session)
 
+    async def receive(self, text_data=None, bytes_data=None):
+        """处理接收到的消息"""
+        if text_data:
+            try:
+                data = json.loads(text_data)
+                message_type = data.get("type")
+
+                if message_type.lower() == "audio":
+                    # 处理音频数据
+                    result = await process_live_media(
+                        self.session_id,
+                        data.get("data"),
+                        data.get("timestamp"),
+                        self.scope["user"].id if self.scope.get("user") else None,
+                        media_type="audio"
+                    )
+                    await self.send(text_data=json.dumps({
+                        "type": "audio_ack",
+                        "success": result["success"],
+                        "message": result.get("message", ""),
+                        "timestamp": data.get("timestamp")
+                    }))
+
+                elif message_type.lower() == "video":
+                    # 处理视频数据
+                    result = await process_live_media(
+                        self.session_id,
+                        data.get("data"),
+                        data.get("timestamp"),
+                        self.scope["user"].id if self.scope.get("user") else None,
+                        media_type="video"
+                    )
+                    await self.send(text_data=json.dumps({
+                        "type": "video_ack",
+                        "success": result["success"],
+                        "message": result.get("message", ""),
+                        "timestamp": data.get("timestamp")
+                    }))
+
+                elif message_type == "control":
+                    # 处理控制消息
+                    control_action = data.get("action")
+                    logger.info(f"收到控制消息: {control_action}")
+                elif message_type == "connect":
+                    # 处理连接确认消息
+                    logger.info("收到连接确认消息")
+                    await self.send(text_data=json.dumps({
+                        "type": "connect_ack",
+                        "message": "连接已建立"
+                    }))
+                else:
+                    logger.warning(f"未知消息类型: {message_type}")
+                    await self.send(text_data=json.dumps({
+                        "type": "error",
+                        "message": f"未知消息类型: {message_type}"
+                    }))
+
+            except json.JSONDecodeError as e:
+                logger.error(f"JSON解析失败: {str(e)}")
+                await self.send(text_data=json.dumps({
+                    "error": "无效的JSON格式",
+                    "type": "parse_error"
+                }))
+        elif bytes_data:
+            logger.warning("收到原始二进制数据，应使用base64编码")
+            await self.send(text_data=json.dumps({
+                "type": "error",
+                "message": "请使用base64编码的文本数据"
+            }))
+
+    async def disconnect(self, close_code):
+        """处理WebSocket连接断开"""
+        logger.info(f"WebSocket连接断开，会话ID: {self.session_id}，关闭代码: {close_code}")
+
     # 修改消息处理函数名以匹配utils.py中的类型
     async def send_audio_and_text(self, event):
         try:

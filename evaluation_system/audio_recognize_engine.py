@@ -179,7 +179,7 @@ async def recognize(audio_data, lang="zh_cn", pd="iat"):
                             for item in ws_data:
                                 for w in item["cw"]:
                                     final_result += w["w"]
-
+                            logger.info("AI语音识别成功")
                     elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR):
                         break
 

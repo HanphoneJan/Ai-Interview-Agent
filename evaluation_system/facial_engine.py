@@ -38,7 +38,7 @@ class FacialExpressionAnalyzer:
         if not self.APPID or not self.API_KEY:
             raise ValueError("缺少必要的环境变量配置: XF_APP_ID 和 XF_API_KEY")
 
-        logger.info("人脸表情分析引擎初始化完成")
+        # logger.info("人脸表情分析引擎初始化完成")
 
     def _generate_headers(self, image_name: str, image_url: str = None) -> Dict[str, str]:
         """
@@ -176,7 +176,7 @@ class FacialExpressionAnalyzer:
             response.raise_for_status()
 
             result = response.json()
-            logger.debug(f"表情分析API响应: {result}")
+            logger.info(f"表情分析API响应: {result}")
 
             # 解析响应中的表情数据
             emotions = self._parse_expression_result(result)

@@ -8,6 +8,8 @@ __pycache__/
 
 # 视频缓存
 *.webm
+*.mp3
+*.mp4
 
 # Distribution / packaging
 .Python

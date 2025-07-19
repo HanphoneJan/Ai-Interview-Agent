@@ -5,16 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba689efc-f18b-4315-95e5-383d0893a574" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/resumes_engines.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/resumes_engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/evaluation_system/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interview_manager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_manager/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_manager/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/audio_recognize_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/audio_recognize_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation_system/facial_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation_system/facial_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/consumers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interview_manager/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/interview_manager/services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -245,7 +241,6 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.resumes_engines" />
         <item itemvalue="Python.audio_generate_engine" />
         <item itemvalue="Python.evaluate_engine" />
       </list>
@@ -311,6 +306,7 @@
       <workItem from="1752754328948" duration="194000" />
       <workItem from="1752781486003" duration="1935000" />
       <workItem from="1752809796255" duration="40134000" />
+      <workItem from="1752909592656" duration="10418000" />
     </task>
     <servers />
   </component>
