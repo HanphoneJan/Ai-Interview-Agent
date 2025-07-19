@@ -3,7 +3,6 @@
 封装讯飞人脸特征分析表情WebAPI接口
 """
 import json
-
 import cv2
 import numpy as np
 import requests
@@ -24,6 +23,18 @@ logger = logging.getLogger(__name__)
 class FacialExpressionAnalyzer:
     """人脸表情分析引擎"""
 
+    # 表情标签映射
+    EXPRESSION_MAP = {
+        0: "other_non_face",  # 其他(非人脸表情图片)
+        1: "other_expression",  # 其他表情
+        2: "happy",           # 喜悦
+        3: "angry",           # 愤怒
+        4: "sad",             # 悲伤
+        5: "fearful",         # 惊恐
+        6: "disgusted",       # 厌恶
+        7: "neutral"          # 中性
+    }
+
     def __init__(self):
         """
         初始化分析器
@@ -37,8 +48,6 @@ class FacialExpressionAnalyzer:
 
         if not self.APPID or not self.API_KEY:
             raise ValueError("缺少必要的环境变量配置: XF_APP_ID 和 XF_API_KEY")
-
-        # logger.info("人脸表情分析引擎初始化完成")
 
     def _generate_headers(self, image_name: str, image_url: str = None) -> Dict[str, str]:
         """
@@ -85,9 +94,11 @@ class FacialExpressionAnalyzer:
             result = response.json()
             logger.debug(f"API响应: {result}")
 
+            # 解析表情结果
+            emotions = self._parse_expression_result(result)
             return {
                 "success": True,
-                "data": result,
+                "data": emotions,
                 "message": "分析成功"
             }
         except requests.exceptions.RequestException as e:
@@ -129,9 +140,11 @@ class FacialExpressionAnalyzer:
             result = response.json()
             logger.debug(f"API响应: {result}")
 
+            # 解析表情结果
+            emotions = self._parse_expression_result(result)
             return {
                 "success": True,
-                "data": result,
+                "data": emotions,
                 "message": "分析成功"
             }
         except FileNotFoundError as e:
@@ -178,7 +191,7 @@ class FacialExpressionAnalyzer:
             result = response.json()
             logger.info(f"表情分析API响应: {result}")
 
-            # 解析响应中的表情数据
+            # 解析表情结果
             emotions = self._parse_expression_result(result)
             return {
                 "success": True,
@@ -206,22 +219,27 @@ class FacialExpressionAnalyzer:
         :param result: API原始响应
         :return: 解析后的表情数据
         """
-        # 根据讯飞API实际返回格式进行解析
-        # 以下为示例实现，需根据实际API文档调整
         if result.get("code") != 0:
             logger.warning(f"API返回非成功状态: {result.get('desc')}")
             return {}
 
         emotions = {}
-        if "data" in result and "face" in result["data"]:
-            for face_idx, face in enumerate(result["data"]["face"]):
-                emotions[f"face_{face_idx}"] = {
-                    "expression": face.get("expression", "unknown"),
-                    "confidence": face.get("confidence", 0.0),
-                    "location": face.get("location", {})
-                }
+        if "data" in result and "fileList" in result["data"]:
+            for idx, face_data in enumerate(result["data"]["fileList"]):
+                if face_data.get("code") == 0:  # 只处理成功的分析结果
+                    label = face_data.get("label", 0)
+                    expression = self.EXPRESSION_MAP.get(label, "unknown")
+
+                    emotions[f"face_{idx}"] = {
+                        "expression": expression,
+                        "confidence": face_data.get("rate", 0.0),
+                        "label": label,
+                        "probabilities": face_data.get("rates", []),
+                        "file_name": face_data.get("file_name", "")
+                    }
 
         return emotions
+
 # 示例用法
 if __name__ == "__main__":
     # 配置日志

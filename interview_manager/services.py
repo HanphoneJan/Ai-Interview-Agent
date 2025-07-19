@@ -419,7 +419,7 @@ async def process_image_data(session_id, base64_data, timestamp):
             return {"success": False, "error": "无法读取图片文件"}
 
         analysis_result = await asyncio.to_thread(analyzer.analyze_frame, frame)
-
+        print(analysis_result["data"]["face_0"]["expression"])
         # 清理临时文件
         try:
             os.unlink(temp_path)

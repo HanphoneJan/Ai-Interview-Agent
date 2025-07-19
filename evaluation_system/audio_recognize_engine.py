@@ -25,7 +25,7 @@ STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
 
 
-class Ws_Param:
+class WsParam:
     """WebSocket参数类，参考示例代码重构"""
 
     def __init__(self, APPID, APIKey, APISecret, AudioData):
@@ -98,7 +98,7 @@ async def recognize(audio_data, lang="zh_cn", pd="iat"):
     audio_data: 16kHz 16位单声道PCM音频数据
     """
     appid, api_key, api_secret = get_credentials()
-    ws_param = Ws_Param(appid, api_key, api_secret, audio_data)
+    ws_param = WsParam(appid, api_key, api_secret, audio_data)
     ws_url = ws_param.create_url()
     session_id = f"sid-{int(time.time() * 1000)}"
 

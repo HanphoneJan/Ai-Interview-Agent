@@ -26,13 +26,6 @@ async def send_audio_and_text_to_client(session_id, audio_data, question_text):
         logger.error(f"安排发送音频和文本失败: {str(e)}", exc_info=True)
 
 
-async def get_current_question(session_id):
-    session = InterviewSession.objects.get(id=session_id)
-    question_count = InterviewQuestion.objects.filter(session=session).count()
-    if question_count > 0:
-        return InterviewQuestion.objects.filter(session=session).order_by('-question_number').first()
-    return None
-
 async def send_audio_to_client(session_id, audio_data):
     channel_layer = get_channel_layer()
     group_name = f"interview_session_{session_id}"
