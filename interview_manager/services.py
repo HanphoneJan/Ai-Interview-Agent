@@ -21,9 +21,15 @@ import time  # 新增：用于记录时间
 
 logger = logging.getLogger(__name__)
 
+# 根据媒体类型创建不同的临时目录
 CUSTOM_TEMP_DIR = os.path.join(settings.MEDIA_ROOT, 'custom_temp')
-# 确保自定义临时目录存在，不存在则创建
-os.makedirs(CUSTOM_TEMP_DIR, exist_ok=True)
+AUDIO_TEMP_DIR = os.path.join(CUSTOM_TEMP_DIR, 'audio')
+VIDEO_TEMP_DIR = os.path.join(CUSTOM_TEMP_DIR, 'video')
+
+# 确保所有临时目录存在
+for dir_path in [CUSTOM_TEMP_DIR, AUDIO_TEMP_DIR, VIDEO_TEMP_DIR]:
+    os.makedirs(dir_path, exist_ok=True)
+
 # 新增：Windows 系统事件循环初始化（程序启动时执行一次）
 if sys.platform == 'win32':
     try:
@@ -39,16 +45,16 @@ async def process_live_media(session_id, base64_data, timestamp, user_id, media_
         # 解码base64数据
         webm_bytes = base64.b64decode(base64_data)
 
-        # 保存到文件系统
+        # 保存到文件系统（根据媒体类型选择不同目录）
         file_path = await sync_to_async(_save_media_to_filesystem)(
-            session_id, webm_bytes, timestamp,media_type
+            session_id, webm_bytes, timestamp, media_type
         )
 
         # 根据媒体类型选择处理方式
         if media_type == "audio":
-            asyncio.create_task(_process_audio(session_id, file_path, timestamp))
+            asyncio.create_task(_process_audio_data(session_id, file_path, timestamp))
         elif media_type == "video":
-            asyncio.create_task(_process_video(session_id, file_path, timestamp))
+            asyncio.create_task(_process_video_data(session_id, file_path, timestamp))
 
         return {"success": True, "message": f"{media_type}数据接收成功"}
 
@@ -58,97 +64,89 @@ async def process_live_media(session_id, base64_data, timestamp, user_id, media_
 
 
 def _save_media_to_filesystem(session_id, data, timestamp, media_type):
-    """仅保存媒体块到文件系统，不涉及数据库"""
-    file_name = f"interview_{session_id}_{timestamp}_{media_type}.webm"
-    file_path = default_storage.save(f"media_chunks/{file_name}", ContentFile(data, name=file_name))
+    """根据媒体类型保存到不同目录"""
+    # 根据媒体类型选择保存目录
+    if media_type == "audio":
+        save_dir = "audio_chunks"
+    elif media_type == "video":
+        save_dir = "video_chunks"
+    else:
+        save_dir = "media_chunks"
+
+    file_name = f"interview_{session_id}_{timestamp}_{media_type}_{os.urandom(8).hex()}.webm"
+    file_path = default_storage.save(f"{save_dir}/{file_name}", ContentFile(data, name=file_name))
     return file_path
 
 
-async def _analyze_media_file(session_id, file_path, timestamp, user_id):
-    """分析媒体文件（音频+视频），不依赖数据库记录"""
-    try:
-        session = await sync_to_async(InterviewSession.objects.get)(id=session_id)
-
-        # 从存储中读取文件内容
-        with default_storage.open(file_path, 'rb') as f:
-            media_bytes = f.read()
-
-        # 并行处理音频和视频
-        audio_task = asyncio.create_task(_process_audio(session, media_bytes, timestamp))
-        video_task = asyncio.create_task(_process_video(session, media_bytes, timestamp))
-
-        await asyncio.gather(audio_task, video_task)
-
-        # 分析完成后可选择删除原始文件（根据需求决定）
-        # await sync_to_async(default_storage.delete)(file_path)
-
-    except Exception as e:
-        logger.error(f"分析媒体文件失败: {str(e)}", exc_info=True)
-
-
-async def _process_audio(session, media_bytes, timestamp):
-    """处理音频数据（仅存储识别后的文本和元数据）"""
+async def _process_audio_data(session_id, file_path, timestamp):
+    """专门处理音频数据，避免重复保存"""
     if platform.system() == 'Windows':
         asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
-    audio_bytes = await _extract_audio_from_webm(media_bytes)
-    if not audio_bytes:
-        logger.error("语音识别：无音频数据可提取")
-        return
-
-    # 语音识别（将音频转为文本）
-    result = await recognize(audio_bytes)
-    if not result["success"]:
-        logger.error(f"语音识别失败: {result.get('error', '未知错误')}")
-        return
-
-    speech_text = result["text"]
-    logger.info(f"语音识别结果: {speech_text[:50]}...")
-
-    # 计算音频时长（秒）并转换为PostgreSQL interval格式
-    duration_seconds = len(audio_bytes) / (16000 * 2)  # 估算秒数 (采样率*位深)
-    duration_interval = f"{duration_seconds} seconds"  # PostgreSQL interval格式
-
-    # 保存识别结果
-    current_question = await sync_to_async(
-        InterviewQuestion.objects.filter(session=session).latest
-    )('asked_at')
-
-    metadata = await sync_to_async(ResponseMetadata.objects.create)(
-        question=current_question,
-        audio_duration=duration_interval  # 使用interval格式
-    )
-
-    analysis = await sync_to_async(ResponseAnalysis.objects.create)(
-        metadata=metadata,
-        speech_text=speech_text,
-        timestamp=timestamp
-    )
-
-    # 评估回答并生成新问题
-    await evaluate_and_generate_question(session, speech_text, analysis)
-
-
-async def _process_video(session_id, file_path, timestamp):
-    """处理视频数据，增强BASE64数据处理"""
     try:
-        # 从存储中读取文件内容
+        # 从已保存的文件中读取数据
         with default_storage.open(file_path, 'rb') as f:
-            media_bytes = f.read()
+            webm_bytes = f.read()
 
-        # 确保数据是字节类型
-        if isinstance(media_bytes, str):
-            try:
-                media_bytes = base64.b64decode(media_bytes)
-            except Exception as e:
-                logger.error(f"视频数据BASE64解码失败: {str(e)}")
-                return
+        # 提取音频数据
+        audio_bytes = await _extract_audio_from_webm(webm_bytes)
+        if not audio_bytes:
+            logger.error("语音识别：无音频数据可提取")
+            return
 
-        # 创建临时文件进行分析
-        temp_path = os.path.join(CUSTOM_TEMP_DIR, f"video_{timestamp}.webm")
+        # 语音识别（将音频转为文本）
+        result = await recognize(audio_bytes)
+        if not result["success"]:
+            logger.error(f"语音识别失败: {result.get('error', '未知错误')}")
+            return
+
+        speech_text = result["text"]
+        logger.info(f"语音识别结果: {speech_text[:50]}...")
+
+        # 计算音频时长（秒）并转换为PostgreSQL interval格式
+        duration_seconds = len(audio_bytes) / (16000 * 2)  # 估算秒数 (采样率*位深)
+        duration_interval = f"{duration_seconds} seconds"  # PostgreSQL interval格式
+
+        # 保存识别结果
+        session = await sync_to_async(InterviewSession.objects.get)(id=session_id)
+        current_question = await sync_to_async(
+            InterviewQuestion.objects.filter(session=session).latest
+        )('asked_at')
+
+        metadata = await sync_to_async(ResponseMetadata.objects.create)(
+            question=current_question,
+            audio_duration=duration_interval  # 使用interval格式
+        )
+
+        analysis = await sync_to_async(ResponseAnalysis.objects.create)(
+            metadata=metadata,
+            speech_text=speech_text,
+            analysis_timestamp=timestamp
+        )
+
+        # 评估回答并生成新问题
+        await evaluate_and_generate_question(session, speech_text, analysis)
+
+    except Exception as e:
+        logger.error(f"处理音频数据失败: {str(e)}", exc_info=True)
+    finally:
+        # 清理原始文件
+        if file_path and default_storage.exists(file_path):
+            await sync_to_async(default_storage.delete)(file_path)
+
+
+async def _process_video_data(session_id, file_path, timestamp):
+    """专门处理视频数据，避免重复保存"""
+    try:
+        # 从已保存的文件中读取数据
+        with default_storage.open(file_path, 'rb') as f:
+            webm_bytes = f.read()
+
+        # 创建视频专用临时文件
+        temp_path = os.path.join(VIDEO_TEMP_DIR, f"video_{timestamp}_{os.urandom(8).hex()}.webm")
         try:
             with open(temp_path, 'wb') as f:
-                f.write(media_bytes)
+                f.write(webm_bytes)
 
             # 验证视频文件
             if not _is_valid_webm(temp_path):
@@ -179,6 +177,7 @@ async def _process_video(session_id, file_path, timestamp):
                 logger.info("视频分析结果保存成功")
 
         finally:
+            # 清理临时文件
             if os.path.exists(temp_path):
                 try:
                     os.unlink(temp_path)
@@ -188,38 +187,24 @@ async def _process_video(session_id, file_path, timestamp):
     except Exception as e:
         logger.error(f"处理视频失败: {str(e)}", exc_info=True)
     finally:
+        # 清理原始文件
         if file_path and default_storage.exists(file_path):
             await sync_to_async(default_storage.delete)(file_path)
 
 
-async def _analyze_video_frames(video_bytes):
-    """分析视频帧获取表情和肢体语言"""
-    temp_path = None
+async def _analyze_video_frames(video_path):
+    """分析视频帧获取表情和肢体语言（直接使用文件路径）"""
     try:
-        # 确保输入数据是字节类型
-        if isinstance(video_bytes, str):
-            # 如果是base64字符串，解码为字节
-            try:
-                video_bytes = base64.b64decode(video_bytes)
-            except Exception as e:
-                logger.error(f"BASE64解码失败: {str(e)}")
-                return {"success": False, "error": "无效的视频数据格式", "data": []}
-
-        # 创建临时文件
-        temp_path = os.path.join(CUSTOM_TEMP_DIR, f"video_{int(time.time() * 1000)}.webm")
-        with open(temp_path, 'wb') as f:  # 注意使用二进制写入模式
-            f.write(video_bytes)
-
         # 验证文件是否有效
-        if not _is_valid_webm(temp_path):
-            logger.error("提取视频：无效的WebM视频文件")
+        if not _is_valid_webm(video_path):
+            logger.error("分析视频：无效的WebM视频文件")
             return {"success": False, "error": "无效的视频文件格式", "data": []}
 
         # 使用OpenCV打开视频
-        cap = cv2.VideoCapture(temp_path)
+        cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
             # 尝试用FFmpeg后端打开
-            cap = cv2.VideoCapture(temp_path, cv2.CAP_FFMPEG)
+            cap = cv2.VideoCapture(video_path, cv2.CAP_FFMPEG)
             if not cap.isOpened():
                 logger.error("无法打开视频文件")
                 return {"success": False, "error": "无法打开视频文件", "data": []}
@@ -259,13 +244,6 @@ async def _analyze_video_frames(video_bytes):
     except Exception as e:
         logger.error(f"视频分析失败: {str(e)}", exc_info=True)
         return {"success": False, "error": str(e), "data": []}
-    finally:
-        pass
-        # if temp_path and os.path.exists(temp_path):
-        #     try:
-        #         os.unlink(temp_path)
-        #     except Exception as e:
-        #         logger.warning(f"删除临时文件失败: {str(e)}")
 
 
 async def _check_ffmpeg_available():
@@ -305,6 +283,7 @@ async def _check_ffmpeg_available():
         except (subprocess.CalledProcessError, FileNotFoundError):
             return False
 
+
 async def has_audio_stream(file_path):
     try:
         cmd = [
@@ -323,7 +302,7 @@ async def has_audio_stream(file_path):
 
 
 async def _extract_audio_from_webm(webm_data):
-    """提取音频（使用自定义临时目录）"""
+    """提取音频（使用音频专用临时目录）"""
     if not await _check_ffmpeg_available():
         logger.error("FFmpeg未安装或不在系统PATH中，请先安装FFmpeg")
         return None
@@ -335,18 +314,19 @@ async def _extract_audio_from_webm(webm_data):
         if isinstance(webm_data, str):
             # 如果是base64字符串，解码为字节
             webm_bytes = base64.b64decode(webm_data)
+            print("提取webm为audio：解码base64")
         else:
             webm_bytes = webm_data
 
-        # 生成自定义目录下的 webm 临时文件
+        # 生成音频专用目录下的 webm 临时文件
         webm_filename = f"audio_extract_{os.urandom(8).hex()}_temp.webm"
-        webm_path = os.path.join(CUSTOM_TEMP_DIR, webm_filename)
+        webm_path = os.path.join(AUDIO_TEMP_DIR, webm_filename)
 
         # 以二进制模式写入文件
         with open(webm_path, 'wb') as f:
             f.write(webm_bytes)
 
-        logger.info(f"创建自定义临时WebM文件: {webm_path}")
+        logger.info(f"创建音频临时WebM文件: {webm_path}")
 
         # 验证文件是否有效
         if not _is_valid_webm(webm_path):
@@ -363,9 +343,9 @@ async def _extract_audio_from_webm(webm_data):
             logger.info("输入的WebM文件不包含音频流")
             return None
 
-        # 生成自定义目录下的 mp3 临时文件
+        # 生成音频专用目录下的 mp3 临时文件
         mp3_filename = f"audio_extract_{os.urandom(8).hex()}_temp.mp3"
-        audio_path = os.path.join(CUSTOM_TEMP_DIR, mp3_filename)
+        audio_path = os.path.join(AUDIO_TEMP_DIR, mp3_filename)
 
         # 构建FFmpeg命令
         cmd = [
@@ -425,14 +405,13 @@ async def _extract_audio_from_webm(webm_data):
         logger.error(f"提取音频失败: {str(e)}", exc_info=True)
         return None
     finally:
-        pass
         # 清理临时文件
-        # for path in [webm_path, audio_path]:
-        #     if path and os.path.exists(path):
-        #         try:
-        #             os.unlink(path)
-        #         except Exception as e:
-        #             logger.warning(f"删除临时文件失败: {path}, 错误: {str(e)}")
+        for path in [webm_path, audio_path]:
+            if path and os.path.exists(path):
+                try:
+                    os.unlink(path)
+                except Exception as e:
+                    logger.warning(f"删除临时文件失败: {path}, 错误: {str(e)}")
 
 
 async def _convert_to_mp4(input_path, output_path):
@@ -496,16 +475,11 @@ def _is_valid_webm(file_path):
         if file_size < 1024:  # 小于1KB视为无效
             return False
 
-        # 使用FFprobe进行更深入的验证
-        try:
-            cmd = ['ffprobe', '-v', 'error', '-show_format', file_path]
-            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            return True
-        except subprocess.CalledProcessError:
-            return False
+        return True
 
     except Exception:
         return False
+
 
 async def generate_initial_question(session):
     new_question_response = spark_ai_engine.generate_response(
@@ -531,6 +505,7 @@ async def generate_initial_question(session):
                 audio_data,  # 发送bytes数据
                 new_question_text
             )
+
 
 async def evaluate_and_generate_question(session, speech_text, analysis):
     evaluation_response = spark_ai_engine.generate_response(
@@ -567,7 +542,8 @@ async def evaluate_and_generate_question(session, speech_text, analysis):
             # 生成语音（音频数据仅用于传输，不存入数据库）
             audio_result = await synthesize(new_question_text)
             if audio_result["success"]:
-                await send_audio_and_text_to_client(session.id, audio_result["audio_data"], new_question_text)  # 修改调用的函数名
+                await send_audio_and_text_to_client(session.id, audio_result["audio_data"],
+                                                    new_question_text)  # 修改调用的函数名
         else:
             logger.error("生成新问题失败")
     else:
